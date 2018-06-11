@@ -1,14 +1,22 @@
 {
   "name": "test-data-bot",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "version": "0.1.0",
+  "description": "Generate test data for your tests easily.",
+  "engines": {
+    "node": ">=8.10.0"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "main": "src.index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "testing",
+    "factory-bot",
+    "fixtures",
+    "test"
+  ],
+  "author": "Jack Franklin",
+  "license": "MIT",
   "devDependencies": {
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
