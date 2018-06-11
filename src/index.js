@@ -17,9 +17,9 @@ class Field {
       return this.value
     }
   }
-  generateIntoObject(resultingObject) {
+  generateIntoObject(overrides, resultingObject) {
     return Object.assign({}, resultingObject, {
-      [this.name]: this.generateValue(),
+      [this.name]: overrides[this.name] || this.generateValue(),
     })
   }
 }
@@ -35,26 +35,33 @@ class Builder {
       this._fields.push(new Field(fieldName, fieldsObj[fieldName]))
     })
 
-    return (overrides = {}) => this.buildInstance(overrides)
+    const builderFuncToReturn = (overrides = {}) =>
+      this.buildInstance(overrides)
+    builderFuncToReturn.map = fn => this.map(fn)
+    return builderFuncToReturn
   }
 
   buildInstance(overrides = {}) {
     return this._fields.reduce((resultingObject, currentField) => {
-      return currentField.generateIntoObject(resultingObject)
+      return currentField.generateIntoObject(overrides, resultingObject)
     }, {})
+  }
+
+  map(fn) {
+    return (overrides = {}) => fn(this.buildInstance(overrides))
   }
 }
 
 const build = name => new Builder(name)
 
-const fakeData = fakeFn => ({
+const fake = fakeFn => ({
   _testDataBotType: 'fakeData',
   fakeFn,
 })
 
-const sequenceData = sequenceFn => ({
+const sequence = sequenceFn => ({
   _testDataBotType: 'sequenceData',
   sequenceFn,
 })
 
-module.exports = { build, fakeData, sequenceData }
+module.exports = { build, fake, sequence }
