@@ -1,5 +1,3 @@
-const faker = require('faker')
-
 class Field {
   constructor(name, value) {
     this.name = name
@@ -10,7 +8,7 @@ class Field {
   generateValue() {
     if (this.value && this.value._testDataBotType) {
       if (this.value._testDataBotType === 'fakeData') {
-        return this.value.fakeFn(faker)
+        return this.value.fakeFn(require('faker'))
       } else if (this.value._testDataBotType === 'sequenceData') {
         return this.value.sequenceFn(this.sequenceStart++)
       }
