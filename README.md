@@ -53,3 +53,22 @@ const user = userBuilder()
 console.log(user)
 // => { name: 'BOB FLEMING', email: 'JACK1@TEST.COM' }
 ```
+
+## Hard coding values and overriding
+
+Sometimes you might want to ensure a certain value, rather than use the generator. In this case you can pass it in when you call the builder:
+
+```js
+const userBuilder = build('User')
+  .fields({
+    name: fake(f => f.name.findName()),
+    email: sequence(x => `jack${x}@test.com`),
+  })
+
+const user = userBuilder({ name: 'JACK' })
+
+console.log(user)
+// => { name: 'JACK', email: 'jack1@test.com' }
+```
+
+In this case, `name` will always be `'JACK'`, and the generator given will not be used.
