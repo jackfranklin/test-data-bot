@@ -11,6 +11,12 @@ class Field {
         return this.value.fakeFn(require('faker'))
       } else if (this.value._testDataBotType === 'sequenceData') {
         return this.value.sequenceFn(this.sequenceStart++)
+      } else if (this.value._testDataBotType === 'perBuild') {
+        return this.value.buildFn()
+      } else {
+        throw new Error(
+          `Unknown test-data-bot type ${this.value._testDataBotType}`
+        )
       }
     } else {
       // primitive type so just return it as is
@@ -64,4 +70,9 @@ const sequence = sequenceFn => ({
   sequenceFn,
 })
 
-module.exports = { build, fake, sequence }
+const perBuild = buildFn => ({
+  _testDataBotType: 'perBuild',
+  buildFn,
+})
+
+module.exports = { build, fake, sequence, perBuild }

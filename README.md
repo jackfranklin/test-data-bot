@@ -31,6 +31,7 @@ Field values can be one of:
 - A static value, in which case any generated data from this builder will always use that value.
 - A call to `sequence`, which takes a function which is passed a number. This is an easy way to ensure a value is unique everytime, but still know what it will be. A sequence is per field, and the number starts at 1.
 - A call to `fake`. This takes a function that will be called with an instance of [faker.js](https://github.com/marak/Faker.js/), and you can use any of the [faker API methods](https://github.com/marak/Faker.js/#api-methods) to return data.
+- A call to `perBuild`. This takes a function that will be called each time an instance is created. This is useful if you want each instance to have the same actual value (say, an object), but one that isn't referentially the same.
 
 ## Mapping
 

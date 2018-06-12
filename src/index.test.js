@@ -1,4 +1,4 @@
-const { build, fake, sequence } = require('./index')
+const { build, fake, sequence, perBuild } = require('./index')
 
 describe('generating fake items', () => {
   it('generates an object that can build items', () => {
@@ -60,5 +60,18 @@ describe('generating fake items', () => {
       name: 'Jack',
       email: 'jack1@test.com',
     })
+  })
+
+  it('allows static values that are generated at runtime', () => {
+    const userBuilder = build('User').fields({
+      name: fake(f => 'Jack'),
+      email: sequence(x => `jack${x}@test.com`),
+      someObject: perBuild(() => ({})),
+    })
+
+    const user1 = userBuilder()
+    const user2 = userBuilder()
+
+    expect(user1.someObject).not.toBe(user2.someObject)
   })
 })
