@@ -1,6 +1,6 @@
 {
   "name": "test-data-bot",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Generate test data for your tests easily.",
   "engines": {
     "node": ">=8.10.0"
