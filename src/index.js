@@ -75,4 +75,6 @@ const perBuild = buildFn => ({
   buildFn,
 })
 
-module.exports = { build, fake, sequence, perBuild }
+const incrementingId = () => sequence(x => x)
+
+module.exports = { build, fake, sequence, perBuild, incrementingId }

@@ -1,4 +1,4 @@
-const { build, fake, sequence, perBuild } = require('./index')
+const { build, fake, sequence, incrementingId, perBuild } = require('./index')
 
 describe('generating fake items', () => {
   it('generates an object that can build items', () => {
@@ -60,6 +60,18 @@ describe('generating fake items', () => {
       name: 'Jack',
       email: 'jack1@test.com',
     })
+  })
+
+  it('supports an incrementing ID field', () => {
+    const userBuilder = build('User').fields({
+      id: incrementingId(),
+    })
+
+    const user1 = userBuilder()
+    const user2 = userBuilder()
+
+    expect(user1.id).toEqual(1)
+    expect(user2.id).toEqual(2)
   })
 
   it('allows static values that are generated at runtime', () => {
