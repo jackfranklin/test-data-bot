@@ -1,4 +1,11 @@
-const { build, fake, sequence, incrementingId, perBuild } = require('./index')
+const {
+  build,
+  fake,
+  sequence,
+  incrementingId,
+  perBuild,
+  oneOf,
+} = require('./index')
 
 describe('generating fake items', () => {
   it('generates an object that can build items', () => {
@@ -41,6 +48,16 @@ describe('generating fake items', () => {
       name: expect.any(String),
       email: 'foo',
     })
+  })
+
+  it('supports oneOf to allow semi-random values', () => {
+    const userBuilder = build('User').fields({
+      name: oneOf('a', 'b', 'c'),
+    })
+
+    const user = userBuilder()
+
+    expect(user.name).toMatch(/a|b|c/)
   })
 
   it('allows a map function to translate the built object', () => {

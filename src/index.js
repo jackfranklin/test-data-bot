@@ -13,6 +13,11 @@ class Field {
         return this.value.sequenceFn(this.sequenceStart++)
       } else if (this.value._testDataBotType === 'perBuild') {
         return this.value.buildFn()
+      } else if (this.value._testDataBotType === 'oneOf') {
+        const randomIndex = Math.floor(
+          Math.random() * this.value.oneOfOptions.length
+        )
+        return this.value.oneOfOptions[randomIndex]
       } else {
         throw new Error(
           `Unknown test-data-bot type ${this.value._testDataBotType}`
@@ -77,4 +82,9 @@ const perBuild = buildFn => ({
 
 const incrementingId = () => sequence(x => x)
 
-module.exports = { build, fake, sequence, perBuild, incrementingId }
+const oneOf = (...oneOfOptions) => ({
+  _testDataBotType: 'oneOf',
+  oneOfOptions,
+})
+
+module.exports = { build, fake, sequence, perBuild, incrementingId, oneOf }
