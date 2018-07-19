@@ -32,6 +32,8 @@ Field values can be one of:
 - A call to `sequence`, which takes a function which is passed a number. This is an easy way to ensure a value is unique everytime, but still know what it will be. A sequence is per field, and the number starts at 1.
 - A call to `fake`. This takes a function that will be called with an instance of [faker.js](https://github.com/marak/Faker.js/), and you can use any of the [faker API methods](https://github.com/marak/Faker.js/#api-methods) to return data.
 - A call to `perBuild`. This takes a function that will be called each time an instance is created. This is useful if you want each instance to have the same actual value (say, an object), but one that isn't referentially the same.
+- A call to `incrementingId`. This will produce a number that starts at `1` and increments each time it is used. Good to model IDs from a database.
+- A call to `oneOf`. This takes any number of primitive values, and picks one at random.
 
 ## Mapping
 
@@ -59,11 +61,10 @@ console.log(user)
 Sometimes you might want to ensure a certain value, rather than use the generator. In this case you can pass it in when you call the builder:
 
 ```js
-const userBuilder = build('User')
-  .fields({
-    name: fake(f => f.name.findName()),
-    email: sequence(x => `jack${x}@test.com`),
-  })
+const userBuilder = build('User').fields({
+  name: fake(f => f.name.findName()),
+  email: sequence(x => `jack${x}@test.com`),
+})
 
 const user = userBuilder({ name: 'JACK' })
 
