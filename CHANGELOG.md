@@ -1,3 +1,7 @@
+### 0.4.0 [19 July]
+
+- add `oneOf` and `incrementingId`
+
 ### 0.3.0 [13 June]
 
 - Fix `main` in `package.json` not pointing in the right place [PR by Kent C. Dodds](https://github.com/jackfranklin/test-data-bot/pull/1)
