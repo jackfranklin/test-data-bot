@@ -5,7 +5,27 @@ const {
   incrementingId,
   perBuild,
   oneOf,
+  bool,
+  arrayOf,
 } = require('./index')
+
+expect.extend({
+  toBeTrueOrFalse(received) {
+    const pass = received === true || received === false
+
+    if (pass) {
+      return {
+        pass: true,
+        message: () => `expected ${received} not to be true or false`,
+      }
+    } else {
+      return {
+        pass: false,
+        message: () => `expected ${received} to be true or false`,
+      }
+    }
+  },
+})
 
 describe('generating fake items', () => {
   it('generates an object that can build items', () => {
@@ -102,5 +122,52 @@ describe('generating fake items', () => {
     const user2 = userBuilder()
 
     expect(user1.someObject).not.toBe(user2.someObject)
+  })
+
+  it('allows a sequence to take a builder', () => {
+    const userBuilder = build('User').fields({
+      name: fake(f => 'Jack'),
+      email: sequence(x => fake(f => f.name.findName() + x)),
+    })
+    const user = userBuilder()
+
+    expect(user.email).toMatch(/(\w+)1/)
+  })
+
+  it('supports arrayOf with another builder', () => {
+    const commentBuilder = build('Comment').fields({
+      text: fake(f => f.lorem.sentence()),
+    })
+
+    const userBuilder = build('User').fields({
+      friends: arrayOf(fake(f => f.name.findName()), 2),
+      comments: arrayOf(commentBuilder(), 3),
+    })
+
+    const user = userBuilder()
+    expect(user.friends).toEqual(
+      expect.arrayContaining([expect.any(String), expect.any(String)])
+    )
+    expect(user.comments).toEqual(
+      expect.arrayContaining(Array(3).fill({ text: expect.any(String) }))
+    )
+  })
+
+  it('lets arrayOf take primitives', () => {
+    const userBuilder = build('User').fields({
+      comments: arrayOf(1, 3),
+    })
+
+    const user = userBuilder()
+
+    expect(user.comments).toEqual([1, 1, 1])
+  })
+
+  it('defines boolean to return either true or false', () => {
+    const userBuilder = build('User').fields({
+      isAdmin: bool(),
+    })
+    const user = userBuilder()
+    expect(user.isAdmin).toBeTrueOrFalse()
   })
 })

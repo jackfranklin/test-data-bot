@@ -5,12 +5,28 @@ class Field {
     this.sequenceStart = 1
   }
 
+  recurseOntoBuilder(builderType, fieldName, nextBuilder) {
+    return new Field(
+      `${builderType}(${fieldName})`,
+      nextBuilder
+    ).generateValue()
+  }
+
   generateValue() {
     if (this.value && this.value._testDataBotType) {
       if (this.value._testDataBotType === 'fakeData') {
         return this.value.fakeFn(require('faker'))
       } else if (this.value._testDataBotType === 'sequenceData') {
-        return this.value.sequenceFn(this.sequenceStart++)
+        const sequenceResponse = this.value.sequenceFn(this.sequenceStart++)
+        if (sequenceResponse.hasOwnProperty('_testDataBotType')) {
+          return this.recurseOntoBuilder(
+            'sequence',
+            this.name,
+            sequenceResponse
+          )
+        } else {
+          return sequenceResponse
+        }
       } else if (this.value._testDataBotType === 'perBuild') {
         return this.value.buildFn()
       } else if (this.value._testDataBotType === 'oneOf') {
@@ -18,6 +34,14 @@ class Field {
           Math.random() * this.value.oneOfOptions.length
         )
         return this.value.oneOfOptions[randomIndex]
+      } else if (this.value._testDataBotType === 'arrayOf') {
+        return Array.from({ length: this.value.count }).map(_ => {
+          return this.recurseOntoBuilder(
+            'arrayOf',
+            this.name,
+            this.value.builder
+          )
+        })
       } else {
         throw new Error(
           `Unknown test-data-bot type ${this.value._testDataBotType}`
@@ -87,4 +111,21 @@ const oneOf = (...oneOfOptions) => ({
   oneOfOptions,
 })
 
-module.exports = { build, fake, sequence, perBuild, incrementingId, oneOf }
+const arrayOf = (builder, count = 1) => ({
+  _testDataBotType: 'arrayOf',
+  builder,
+  count,
+})
+
+const bool = () => oneOf(true, false)
+
+module.exports = {
+  build,
+  arrayOf,
+  fake,
+  sequence,
+  perBuild,
+  incrementingId,
+  oneOf,
+  bool,
+}
