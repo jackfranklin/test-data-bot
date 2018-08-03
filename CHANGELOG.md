@@ -1,3 +1,7 @@
+### 0.6.0 [03 August]
+
+- rebuilt to enable fully nested builders
+
 ### 0.5.0 [03 August]
 
 - add `arrayOf`
