@@ -34,6 +34,8 @@ Field values can be one of:
 - A call to `perBuild`. This takes a function that will be called each time an instance is created. This is useful if you want each instance to have the same actual value (say, an object), but one that isn't referentially the same.
 - A call to `incrementingId`. This will produce a number that starts at `1` and increments each time it is used. Good to model IDs from a database.
 - A call to `oneOf`. This takes any number of primitive values, and picks one at random.
+- A call to `arrayOf`. This takes any value (including another builder) and generates an array of them. It also takes the array `length` as the second argument: `arrayOf('foo', 2)` will generate `['foo', 'foo']`. `arrayOf(fake(f => f.name.findName()), 5)` will generate an array of 5 random names.
+- A call to `bool`. This is a shortcut for `oneOf(true, false)` and will pick one of them at random.
 
 ## Mapping
 

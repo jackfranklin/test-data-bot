@@ -1,3 +1,9 @@
+### 0.5.0 [03 August]
+
+- add `arrayOf`
+- add `bool`
+- Enable `sequence` to take other builders.
+
 ### 0.4.0 [19 July]
 
 - add `oneOf` and `incrementingId`
