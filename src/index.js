@@ -1,67 +1,36 @@
-class Field {
-  constructor(name, value) {
-    this.name = name
-    this.value = value
-    this.sequenceStart = 1
-  }
+const Generator = require('./generator')
 
-  recurseOntoBuilder(builderType, fieldName, nextBuilder) {
-    return new Field(
-      `${builderType}(${fieldName})`,
-      nextBuilder
-    ).generateValue()
+class Field {
+  constructor(name, generator) {
+    this._name = name
+    this._generator = generator
+    this._sequenceCount = 1
   }
 
   generateValue() {
-    if (this.value && this.value._testDataBotType) {
-      if (this.value._testDataBotType === 'fakeData') {
-        return this.value.fakeFn(require('faker'))
-      } else if (this.value._testDataBotType === 'sequenceData') {
-        const sequenceResponse = this.value.sequenceFn(this.sequenceStart++)
-        if (sequenceResponse.hasOwnProperty('_testDataBotType')) {
-          return this.recurseOntoBuilder(
-            'sequence',
-            this.name,
-            sequenceResponse
-          )
-        } else {
-          return sequenceResponse
-        }
-      } else if (this.value._testDataBotType === 'perBuild') {
-        return this.value.buildFn()
-      } else if (this.value._testDataBotType === 'oneOf') {
-        const randomIndex = Math.floor(
-          Math.random() * this.value.oneOfOptions.length
-        )
-        return this.value.oneOfOptions[randomIndex]
-      } else if (this.value._testDataBotType === 'arrayOf') {
-        return Array.from({ length: this.value.count }).map(_ => {
-          return this.recurseOntoBuilder(
-            'arrayOf',
-            this.name,
-            this.value.builder
-          )
-        })
-      } else {
-        throw new Error(
-          `Unknown test-data-bot type ${this.value._testDataBotType}`
-        )
-      }
+    if (this._generator instanceof Generator) {
+      return this._generator.generate({
+        sequenceCount: this._sequenceCount++,
+      })
     } else {
-      // primitive type so just return it as is
-      return this.value
+      // must be a primitive value
+      return new Generator().fullyExpandReturn(
+        this._generator,
+        this._sequenceCount++
+      )
     }
   }
+
   generateIntoObject(overrides, resultingObject) {
     return Object.assign({}, resultingObject, {
-      [this.name]: overrides[this.name] || this.generateValue(),
+      [this._name]: overrides[this._name] || this.generateValue(),
     })
   }
 }
 
 class Builder {
   constructor(name) {
-    this.name = name
+    this._name = name
     this._fields = []
   }
 
@@ -89,33 +58,33 @@ class Builder {
 
 const build = name => new Builder(name)
 
-const fake = fakeFn => ({
-  _testDataBotType: 'fakeData',
-  fakeFn,
-})
+const fake = fakeFn =>
+  new Generator('fake', {
+    fakeFn,
+  })
 
-const sequence = sequenceFn => ({
-  _testDataBotType: 'sequenceData',
-  sequenceFn,
-})
+const sequence = sequenceFn =>
+  new Generator('sequence', {
+    sequenceFn,
+  })
 
-const perBuild = buildFn => ({
-  _testDataBotType: 'perBuild',
-  buildFn,
-})
+const perBuild = buildFn =>
+  new Generator('perBuild', {
+    buildFn,
+  })
 
 const incrementingId = () => sequence(x => x)
 
-const oneOf = (...oneOfOptions) => ({
-  _testDataBotType: 'oneOf',
-  oneOfOptions,
-})
+const oneOf = (...oneOfOptions) =>
+  new Generator('oneOf', {
+    oneOfOptions,
+  })
 
-const arrayOf = (builder, count = 1) => ({
-  _testDataBotType: 'arrayOf',
-  builder,
-  count,
-})
+const arrayOf = (builder, count = 1) =>
+  new Generator('arrayOf', {
+    builder,
+    count,
+  })
 
 const bool = () => oneOf(true, false)
 

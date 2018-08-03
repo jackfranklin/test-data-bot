@@ -129,9 +129,10 @@ describe('generating fake items', () => {
       name: fake(f => 'Jack'),
       email: sequence(x => fake(f => f.name.findName() + x)),
     })
+
     const user = userBuilder()
 
-    expect(user.email).toMatch(/(\w+)1/)
+    expect(user.email).toMatch(/(.+)1/)
   })
 
   it('supports arrayOf with another builder', () => {
@@ -169,5 +170,74 @@ describe('generating fake items', () => {
     })
     const user = userBuilder()
     expect(user.isAdmin).toBeTrueOrFalse()
+  })
+
+  it('allows deeply nested fake data', () => {
+    const itemBuilder = build('Item').fields({
+      images: perBuild(() => ({
+        medium: arrayOf(fake(f => f.image.imageUrl()), 3),
+        large: arrayOf(fake(f => f.image.imageUrl()), 3),
+        original: arrayOf(fake(f => f.image.imageUrl()), 3),
+      })),
+    })
+
+    const item = itemBuilder()
+
+    expect(item.images.medium).toEqual(
+      expect.arrayContaining(Array(3).fill(expect.any(String)))
+    )
+    expect(item.images.large).toEqual(
+      expect.arrayContaining(Array(3).fill(expect.any(String)))
+    )
+    expect(item.images.original).toEqual(
+      expect.arrayContaining(Array(3).fill(expect.any(String)))
+    )
+
+    expect(item.images.medium[0]).toMatch(/lorempixel/)
+  })
+
+  it('allows deeply nested array data', () => {
+    const itemBuilder = build('Item').fields({
+      images: {
+        medium: [fake(f => f.image.imageUrl())],
+      },
+    })
+
+    const item = itemBuilder()
+
+    expect(item.images.medium).toEqual(
+      expect.arrayContaining(Array(1).fill(expect.any(String)))
+    )
+    expect(item.images.medium[0]).toMatch(/lorempixel/)
+  })
+
+  it('lets oneOf take a builder', () => {
+    const fooBuilder = build('Foo').fields({
+      name: 'foo',
+    })
+    const barBuilder = build('Bar').fields({
+      name: 'bar',
+    })
+
+    const testBuilder = build('Testing').fields({
+      data: oneOf(fooBuilder, barBuilder),
+    })
+
+    const test = testBuilder()
+
+    expect(test.data.name === 'foo' || test.data.name === 'bar').toEqual(true)
+  })
+
+  it('does the right thing with arrays and sequences', () => {
+    const userBuilder = build('User').fields({
+      emails: arrayOf(sequence(x => `jack${x}@gmail.com`), 3),
+    })
+    const user = userBuilder()
+
+    expect(user.emails).toEqual([
+      'jack1@gmail.com',
+      'jack2@gmail.com',
+      'jack3@gmail.com',
+    ])
   })
 })
