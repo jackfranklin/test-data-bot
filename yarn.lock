@@ -920,10 +920,10 @@ eslint-config-unobtrusive@1.2.2:
   resolved "https://registry.yarnpkg.com/eslint-config-unobtrusive/-/eslint-config-unobtrusive-1.2.2.tgz#50899d543a0f365b610453d50ee61622de60ae54"
   integrity sha512-oKG54fz/1JhDukb+OHT28iG3g8bXr5gWEQnedj29z3u4oLZjtv3aSG+bSBGM5KHZ9nYp2PpNf0jdDiRoDXykrQ==
 
-eslint-plugin-jest@21.17.0:
-  version "21.17.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-21.17.0.tgz#fdb00e2f9ff16987d6ebcf2c75c7add105760bbb"
-  integrity sha512-kB0gaMLy4RA1bAltYSnnoW33hzX0bUrALGaIqaLoB41Fif38/uAv6oNUFbrzp7aFrwegxKUgFcE/8Z0DZEa0SQ==
+eslint-plugin-jest@21.27.2:
+  version "21.27.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-21.27.2.tgz#2a795b7c3b5e707df48a953d651042bd01d7b0a8"
+  integrity sha512-0E4OIgBJVlAmf1KfYFtZ3gYxgUzC5Eb3Jzmrc9ikI1OY+/cM8Kh72Ti7KfpeHNeD3HJNf9SmEfmvQLIz44Hrhw==
 
 eslint-plugin-prettier@2.6.0:
   version "2.6.0"
