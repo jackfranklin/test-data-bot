@@ -23,7 +23,9 @@ class Field {
 
   generateIntoObject(overrides, resultingObject) {
     return Object.assign({}, resultingObject, {
-      [this._name]: overrides[this._name] || this.generateValue(),
+      [this._name]: overrides.hasOwnProperty(this._name)
+        ? overrides[this._name]
+        : this.generateValue(),
     })
   }
 }

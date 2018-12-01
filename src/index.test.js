@@ -240,4 +240,17 @@ describe('generating fake items', () => {
       'jack3@gmail.com',
     ])
   })
+
+  it('lets a random boolean be overriden to be false', () => {
+    const userBuilder = build('User').fields({
+      admin: bool(),
+    })
+    // this test is sometimes true, the bug that lead to this test
+    // was that the `false` would be ignored and the value would still be random
+    // so we run this 10 times to get around the randomness of the failure
+    Array.from({ length: 10 }).map(_ => {
+      const user = userBuilder({ admin: false })
+      expect(user.admin).toEqual(false)
+    })
+  })
 })
