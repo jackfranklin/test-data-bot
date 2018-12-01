@@ -21,7 +21,7 @@
     "eslint": "4.19.1",
     "eslint-config-prettier": "3.3.0",
     "eslint-config-unobtrusive": "1.2.2",
-    "eslint-plugin-jest": "21.17.0",
+    "eslint-plugin-jest": "21.27.2",
     "eslint-plugin-prettier": "2.6.0",
     "jest": "23.1.0",
     "prettier": "1.15.3"
