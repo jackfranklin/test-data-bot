@@ -13,14 +13,14 @@ class Generator {
       return value.map(v => this.fullyExpandReturn(v, nextSequence))
     } else if (value.name === 'builderFuncToReturn') {
       return value()
-    } else if (typeof value === 'function') {
-      return this.fullyExpandReturn(value(), nextSequence)
     } else if (typeof value === 'object') {
       return Object.keys(value).reduce((newObj, currentKey) => {
         const newValue = value[currentKey]
         newObj[currentKey] = this.fullyExpandReturn(newValue, nextSequence)
         return newObj
       }, {})
+    } else if (typeof value === 'function') {
+      return value
     } else {
       return value
     }
@@ -55,6 +55,11 @@ class Generator {
             return this.data.builder.generate({
               sequenceCount: sequenceCount++,
             })
+          } else if (
+            typeof this.data.builder === 'function' &&
+            this.data.builder.name === 'builderFuncToReturn'
+          ) {
+            return this.data.builder()
           } else {
             return this.data.builder
           }

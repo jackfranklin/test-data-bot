@@ -142,7 +142,7 @@ describe('generating fake items', () => {
 
     const userBuilder = build('User').fields({
       friends: arrayOf(fake(f => f.name.findName()), 2),
-      comments: arrayOf(commentBuilder(), 3),
+      comments: arrayOf(commentBuilder, 3),
     })
 
     const user = userBuilder()
@@ -152,6 +152,9 @@ describe('generating fake items', () => {
     expect(user.comments).toEqual(
       expect.arrayContaining(Array(3).fill({ text: expect.any(String) }))
     )
+
+    expect(user.friends[0]).not.toEqual(user.friends[1])
+    expect(user.comments[0]).not.toEqual(user.comments[1])
   })
 
   it('lets arrayOf take primitives', () => {
@@ -252,5 +255,50 @@ describe('generating fake items', () => {
       const user = userBuilder({ admin: false })
       expect(user.admin).toEqual(false)
     })
+  })
+
+  it('lets you pass a plain old function', () => {
+    const userBuilder = build('User').fields({
+      isAdmin: () => false,
+    })
+    const user = userBuilder()
+    expect(user.isAdmin()).toEqual(false)
+  })
+
+  it('lets you return a function from perBuild', () => {
+    const userBuilder = build('User').fields({
+      isAdmin: perBuild(() => jest.fn().mockImplementation(() => false)),
+    })
+    const user = userBuilder()
+    expect(user.isAdmin()).toEqual(false)
+  })
+
+  it('lets you define nested builders', () => {
+    const imageBuilder = build('image').fields({
+      original: fake(f => f.image.imageUrl()),
+      slug: fake(f => f.lorem.slug()),
+    })
+
+    const userBuilder = build('User').fields({
+      isAdmin: perBuild(() => jest.fn().mockImplementation(() => false)),
+      images: arrayOf(imageBuilder, 3),
+    })
+
+    const user = userBuilder()
+
+    expect(user.images.length).toEqual(3)
+    expect(user.images.map(i => i.original)).toEqual([
+      expect.any(String),
+      expect.any(String),
+      expect.any(String),
+    ])
+    expect(user.images.map(i => i.slug)).toEqual([
+      expect.any(String),
+      expect.any(String),
+      expect.any(String),
+    ])
+    expect(
+      (user.images[0].slug !== user.images[1].slug) !== user.images[2].slug
+    ).toEqual(true)
   })
 })

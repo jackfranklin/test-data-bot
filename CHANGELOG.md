@@ -1,3 +1,8 @@
+### 0.7.0 [24 Jan] 2019
+
+- Fix a bug where you were unable to pass plain functions in as values to builders
+- Fix `arrayOf` behaviour so it can take a builder and correctly call it.
+
 ### 0.6.1 [01 Dec] 2018
 
 - fix bug that meant overriding a boolean to always be `false` wouldn't happen (https://github.com/jackfranklin/test-data-bot/issues/6)
