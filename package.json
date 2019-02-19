@@ -19,7 +19,7 @@
   "author": "Jack Franklin",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "5.14.0",
+    "eslint": "5.14.1",
     "eslint-config-prettier": "4.0.0",
     "eslint-config-unobtrusive": "1.2.2",
     "eslint-plugin-jest": "22.3.0",
