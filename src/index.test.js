@@ -7,6 +7,7 @@ const {
   oneOf,
   bool,
   arrayOf,
+  numberBetween,
 } = require('./index')
 
 expect.extend({
@@ -173,6 +174,25 @@ describe('generating fake items', () => {
     })
     const user = userBuilder()
     expect(user.isAdmin).toBeTrueOrFalse()
+  })
+
+  it('defines numberBetween to return a random integer between from min to max ', () => {
+    const [min, max] = [-1, 1]
+    const accountBuilder = build('Account').fields({
+      balance: numberBetween(min, max),
+    })
+    const account = accountBuilder()
+    expect(account.balance >= min).toBeTruthy()
+    expect(account.balance <= max).toBeTruthy()
+  })
+
+  it('lets a random number by numberBetween be overriden to be another number outside given range', () => {
+    const [min, max] = [-1, 1]
+    const accountBuilder = build('Account').fields({
+      balance: numberBetween(min, max),
+    })
+    const account = accountBuilder({ balance: -100 })
+    expect(account.balance).toBe(-100)
   })
 
   it('allows deeply nested fake data', () => {
