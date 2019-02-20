@@ -265,6 +265,14 @@ describe('generating fake items', () => {
     expect(user.isAdmin()).toEqual(false)
   })
 
+  it('lets you pass null directly', () => {
+    const userBuilder = build('User').fields({
+      name: null,
+    })
+    const user = userBuilder()
+    expect(user.name).toBe(null)
+  })
+
   it('lets you return a function from perBuild', () => {
     const userBuilder = build('User').fields({
       isAdmin: perBuild(() => jest.fn().mockImplementation(() => false)),

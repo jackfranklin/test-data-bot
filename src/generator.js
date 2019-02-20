@@ -5,7 +5,10 @@ class Generator {
   }
 
   fullyExpandReturn(value, nextSequence) {
-    if (value instanceof Generator) {
+    if (Object(value) !== value) {
+      // this means value is primitive and we should just return it
+      return value
+    } else if (value instanceof Generator) {
       return value.generate({
         sequenceCount: nextSequence,
       })
@@ -22,6 +25,13 @@ class Generator {
     } else if (typeof value === 'function') {
       return value
     } else {
+      console.error(
+        'test-data-bot does not know how to handle the given value',
+        value
+      )
+      console.error(
+        'please report this as an issue: https://github.com/jackfranklin/test-data-bot/issues/new'
+      )
       return value
     }
   }
