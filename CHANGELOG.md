@@ -1,3 +1,7 @@
+### 0.7.1 [20 Feb] 2019
+
+- Fix passing primitive values like `null` or `undefined` to a builder. (https://github.com/jackfranklin/test-data-bot/issues/39)
+
 ### 0.7.0 [24 Jan] 2019
 
 - Fix a bug where you were unable to pass plain functions in as values to builders
