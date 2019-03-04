@@ -36,6 +36,7 @@ Field values can be one of:
 - A call to `oneOf`. This takes any number of primitive values, and picks one at random.
 - A call to `arrayOf`. This takes any value (including another builder) and generates an array of them. It also takes the array `length` as the second argument: `arrayOf('foo', 2)` will generate `['foo', 'foo']`. `arrayOf(fake(f => f.name.findName()), 5)` will generate an array of 5 random names.
 - A call to `bool`. This is a shortcut for `oneOf(true, false)` and will pick one of them at random.
+- A call to `numberBetween`. This takes two arguments as min/max, and generates a random integer between them. `numberBetween(0, 10)` is a shortcut for `fake(f => f.random.number({ min: 0, max: 10 })`.
 
 ## Mapping
 

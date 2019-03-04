@@ -90,6 +90,8 @@ const arrayOf = (builder, count = 1) =>
 
 const bool = () => oneOf(true, false)
 
+const numberBetween = (min, max) => fake(f => f.random.number({ min, max }))
+
 module.exports = {
   build,
   arrayOf,
@@ -99,4 +101,5 @@ module.exports = {
   incrementingId,
   oneOf,
   bool,
+  numberBetween,
 }
