@@ -17,6 +17,9 @@
     "test"
   ],
   "author": "Jack Franklin",
+  "homepage": "https://github.com/jackfranklin/test-data-bot#readme",
+  "bugs": "https://github.com/jackfranklin/test-data-bot/issues",
+  "repository": "github:jackfranklin/test-data-bot",
   "license": "MIT",
   "devDependencies": {
     "eslint": "5.15.3",
