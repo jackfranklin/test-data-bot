@@ -7,8 +7,8 @@
   },
   "main": "src/index.js",
   "scripts": {
-    "test": "jest ts-src",
-    "lint": "eslint 'src/*.ts' && prettier --list-different 'src/*.ts'"
+    "test": "yarn run lint && jest ts-src",
+    "lint": "eslint 'ts-src/*.ts' && prettier --list-different 'ts-src/*.ts'"
   },
   "keywords": [
     "testing",
