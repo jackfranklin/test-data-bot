@@ -2,22 +2,21 @@ module.exports = {
   env: {
     es6: true,
     node: true,
-    jest: true
+    jest: true,
   },
-  parserOptions: { ecmaVersion: 2018 },
-  plugins: ["prettier", "jest"],
-  extends: ["unobtrusive", "prettier"],
+  parser: '@typescript-eslint/parser',
+  plugins: ['prettier', 'jest', '@typescript-eslint'],
+  extends: ['prettier', 'plugin:@typescript-eslint/recommended'],
   rules: {
-    "prettier/prettier": ["error"],
-
-    // generic rules
-    "no-unused-vars": "error",
+    'prettier/prettier': ['error'],
+    '@typescript-eslint/indent': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
 
     // rules from eslint-plugin-jest
-    "jest/no-disabled-tests": "error",
-    "jest/no-focused-tests": "error",
-    "jest/no-identical-title": "error",
-    "jest/no-test-prefixes": "error",
-    "jest/valid-expect": "error"
-  }
+    'jest/no-disabled-tests': 'error',
+    'jest/no-focused-tests': 'error',
+    'jest/no-identical-title': 'error',
+    'jest/no-test-prefixes': 'error',
+    'jest/valid-expect': 'error',
+  },
 };
