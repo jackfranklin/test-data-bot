@@ -2,7 +2,11 @@ import { build, sequence, fake } from './index';
 
 describe('test-data-bot', () => {
   it('can build an object with primitive values only', () => {
-    const userBuilder = build('User', {
+    interface User {
+      name: string;
+    }
+
+    const userBuilder = build<User>('User', {
       fields: {
         name: 'jack',
       },
@@ -16,21 +20,28 @@ describe('test-data-bot', () => {
 
   describe('sequence', () => {
     it('increments the sequence value per build', () => {
-      const userBuilder = build('User', {
+      interface User {
+        id: number;
+      }
+
+      const userBuilder = build<User>('User', {
         fields: {
           id: sequence(),
         },
       });
 
       const users = [userBuilder(), userBuilder()];
-
       expect(users).toEqual([{ id: 1 }, { id: 2 }]);
     });
   });
 
   describe('fake', () => {
     it('generates some fake data', () => {
-      const userBuilder = build('User', {
+      interface User {
+        name: string;
+      }
+
+      const userBuilder = build<User>('User', {
         fields: {
           name: fake(f => f.name.findName()),
         },

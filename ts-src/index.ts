@@ -13,28 +13,25 @@ interface FakerGenerator {
 type FieldGenerator = FakerGenerator | SequenceGenerator;
 type Field = string | number | FieldGenerator;
 
-interface BuildConfiguration {
-  fields: {
-    [x: string]: Field;
-  };
+interface BuildConfiguration<FactoryResultType> {
+  readonly fields: { readonly [x in keyof FactoryResultType]: Field };
 }
 
 const isGenerator = (field: Field): field is FieldGenerator => {
   return (field as FieldGenerator).generatorType !== undefined;
 };
 
-export const build = (
+export const build = <FactoryResultType>(
   factoryName: string,
-  config: BuildConfiguration
-): (() => {
-  // TODO: this is not good!
-  [x: string]: any;
-}) => {
+  config: BuildConfiguration<FactoryResultType>
+): (() => FactoryResultType) => {
   let sequenceCounter = 0;
 
   return () => {
-    const fieldsToReturn = Object.entries(config.fields).reduce(
-      (fieldsAccumulator: {}, currentField) => {
+    const fieldsToReturn = Object.entries<Field>(config.fields).reduce<
+      FactoryResultType
+    >(
+      (fieldsAccumulator, currentField) => {
         const [fieldName, fieldValue] = currentField;
 
         let calculatedValue;
@@ -60,9 +57,8 @@ export const build = (
           ...fieldsAccumulator,
           [fieldName]: calculatedValue,
         };
-        return fieldsAccumulator;
       },
-      {}
+      {} as FactoryResultType
     );
 
     return fieldsToReturn;
