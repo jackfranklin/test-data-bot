@@ -31,7 +31,7 @@
     "eslint-plugin-jest": "22.6.4",
     "eslint-plugin-prettier": "3.1.0",
     "jest": "24.8.0",
-    "prettier": "1.17.1"
+    "prettier": "1.18.0"
   },
   "dependencies": {
     "faker": "4.1.0"
