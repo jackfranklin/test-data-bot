@@ -1080,10 +1080,10 @@ eslint-config-unobtrusive@1.2.3:
   resolved "https://registry.yarnpkg.com/eslint-config-unobtrusive/-/eslint-config-unobtrusive-1.2.3.tgz#4567a80e112b08e57cea515eba58cbd11320d2ee"
   integrity sha512-Qh/sJpjCFY9i7OoxkzLW+u7n0H63fhSfR531036Ztk/PdM5pgB1MYPhA901l1op2ibSC+bS4a1d8noL7X8nE8w==
 
-eslint-plugin-jest@22.14.1:
-  version "22.14.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-22.14.1.tgz#32287dade9bc0a1920c61e25a71cf11363d78015"
-  integrity sha512-mpLjhADl+HjagrlaGNx95HIji089S18DhnU/Ee8P8VP+dhEnuEzb43BXEaRmDgQ7BiSUPcSCvt1ydtgPkjOF/Q==
+eslint-plugin-jest@22.15.0:
+  version "22.15.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-22.15.0.tgz#fe70bfff7eeb47ca0ab229588a867f82bb8592c5"
+  integrity sha512-hgnPbSqAIcLLS9ePb12hNHTRkXnkVaCfOwCt2pzQ8KpOKPWGA4HhLMaFN38NBa/0uvLfrZpcIRjT+6tMAfr58Q==
   dependencies:
     "@typescript-eslint/experimental-utils" "^1.13.0"
 
