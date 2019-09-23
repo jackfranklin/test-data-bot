@@ -1100,10 +1100,10 @@ eslint-config-prettier@6.3.0:
   dependencies:
     get-stdin "^6.0.0"
 
-eslint-config-unobtrusive@1.2.3:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/eslint-config-unobtrusive/-/eslint-config-unobtrusive-1.2.3.tgz#4567a80e112b08e57cea515eba58cbd11320d2ee"
-  integrity sha512-Qh/sJpjCFY9i7OoxkzLW+u7n0H63fhSfR531036Ztk/PdM5pgB1MYPhA901l1op2ibSC+bS4a1d8noL7X8nE8w==
+eslint-config-unobtrusive@1.2.5:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/eslint-config-unobtrusive/-/eslint-config-unobtrusive-1.2.5.tgz#4e5b09ef625e31e78396176e3c23874491d04180"
+  integrity sha512-JOhF2PaSXBnT2JapDVUDpbOOj3rY0nOTxuP6J/V9Dd4sRfCFqjBaT0uSHUbMzr4ta2rOyrF2GJjhDvvkbzsr9Q==
 
 eslint-plugin-jest@22.17.0:
   version "22.17.0"
