@@ -7,7 +7,7 @@
   },
   "main": "src/index.js",
   "scripts": {
-    "test": "yarn run lint && jest src",
+    "test": "jest src",
     "lint": "eslint --quiet 'src/*.ts' && prettier --list-different 'src/*.ts'",
     "build": "tsc --build tsconfig.json"
   },
