@@ -71,6 +71,21 @@ describe('test-data-bot', () => {
       const users = [userBuilder(), userBuilder()];
       expect(users).toEqual([{ id: 1 }, { id: 2 }]);
     });
+
+    it('can take a function to return a number', () => {
+      interface User {
+        id: number;
+      }
+
+      const userBuilder = build<User>('User', {
+        fields: {
+          id: sequence(x => x * 10),
+        },
+      });
+
+      const users = [userBuilder(), userBuilder()];
+      expect(users).toEqual([{ id: 10 }, { id: 20 }]);
+    });
   });
 
   describe('mapping', () => {

@@ -3,7 +3,11 @@ import { mapValues } from 'lodash';
 
 interface SequenceGenerator {
   generatorType: 'sequence';
-  call: (counter: number) => number;
+  userProvidedFunction: (counter: number) => number;
+  call: (
+    userProvidedFunction: (counter: number) => number,
+    counter: number
+  ) => number;
 }
 
 interface FakerGenerator {
@@ -100,7 +104,10 @@ export const build = <FactoryResultType>(
       switch (fieldValue.generatorType) {
         case 'sequence': {
           ++sequenceCounter;
-          calculatedValue = fieldValue.call(sequenceCounter);
+          calculatedValue = fieldValue.call(
+            fieldValue.userProvidedFunction,
+            sequenceCounter
+          );
           break;
         }
 
@@ -155,11 +162,17 @@ export const oneOf = <T>(...options: T[]): OneOfGenerator => {
 
 export const bool = (): OneOfGenerator => oneOf(true, false);
 
-export const sequence = (): SequenceGenerator => {
+export const sequence = (
+  userProvidedFunction: (counter: number) => number = x => x
+): SequenceGenerator => {
   return {
     generatorType: 'sequence',
-    call: (counter: number) => {
-      return counter;
+    userProvidedFunction,
+    call: (
+      userProvidedFunction: (counter: number) => number,
+      counter: number
+    ) => {
+      return userProvidedFunction(counter);
     },
   };
 };
