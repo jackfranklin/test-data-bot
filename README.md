@@ -80,6 +80,24 @@ const userTwo = userBuilder();
 // userTwo.id === 2
 ```
 
+If you need more control, you can pass `sequence` a function that will be called with the number. This is useful to ensure completely unique emails, for example:
+
+```js
+const { build, sequence } = require('@jackfranklin/test-data-bot');
+
+const userBuilder = build('User', {
+  fields: {
+    email: sequence(x => `jack${x}@gmail.com`),
+  },
+});
+
+const userOne = userBuilder();
+const userTwo = userBuilder();
+
+// userOne.email === jack1@gmail.com
+// userTwo.email === jack2@gmail.com
+```
+
 ### Randomly picking between an option
 
 If you want an object to have a random value, picked from a list you control, you can use `oneOf`:
