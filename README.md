@@ -1,5 +1,7 @@
 # @jackfranklin/test-data-bot
 
+[![CircleCI](https://circleci.com/gh/jackfranklin/test-data-bot.svg?style=svg)](https://circleci.com/gh/jackfranklin/test-data-bot)
+
 **IMPORTANT**: `@jackfranklin/test-data-bot` is the new version of this package, written in TypeScript and initially released as version 1.0.0.
 
 The old package, `test-data-bot` (_not scoped to my username on npm_) was last released as 0.8.0 and is not being updated any more. It is recommended to upgrade to 1.0.0, which has some breaking changes documented below.
