@@ -5,11 +5,13 @@
   "engines": {
     "node": ">=10.13"
   },
-  "main": "src/index.js",
+  "main": "build/index.js",
   "scripts": {
     "test": "jest src",
     "lint": "eslint --quiet 'src/*.ts' && prettier --list-different 'src/*.ts'",
-    "build": "tsc --build tsconfig.json"
+    "build": "tsc --build tsconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint && npm run test"
   },
   "keywords": [
     "testing",
