@@ -37,7 +37,7 @@ type Field =
   | any[];
 
 type FieldsConfiguration<FactoryResultType> = {
-  readonly [x in keyof FactoryResultType]: Field
+  readonly [x in keyof FactoryResultType]: Field;
 };
 
 interface Overrides<FactoryResultType> {
