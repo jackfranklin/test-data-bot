@@ -1,4 +1,4 @@
-import { build, sequence, fake } from './index';
+import { build, sequence, fake, oneOf, bool } from './index';
 
 describe('test-data-bot', () => {
   it('can build an object with primitive values only', () => {
@@ -49,6 +49,66 @@ describe('test-data-bot', () => {
 
       const user = userBuilder();
       expect(user.name).toEqual(expect.any(String));
+    });
+  });
+
+  describe('oneOf', () => {
+    test('bool is provided as a shortcut for oneOf(true, false)', () => {
+      interface User {
+        admin: boolean;
+      }
+
+      const userBuilder = build<User>('User', {
+        fields: {
+          admin: bool(),
+        },
+      });
+
+      const user = userBuilder();
+      expect(user.admin === true || user.admin === false).toEqual(true);
+    });
+
+    it('picks a random entry from the given selection', () => {
+      interface User {
+        name: string;
+      }
+
+      const userBuilder = build<User>('User', {
+        fields: {
+          name: oneOf('a', 'b', 'c'),
+        },
+      });
+
+      const user = userBuilder();
+      expect(['a', 'b', 'c'].includes(user.name)).toEqual(true);
+    });
+  });
+
+  describe('nested objects', () => {
+    it('fully expands objects to ensure all builders are executed', () => {
+      interface User {
+        details: {
+          name: string;
+        };
+        admin: boolean;
+      }
+
+      const userBuilder = build<User>('User', {
+        fields: {
+          details: {
+            name: fake(f => f.name.findName()),
+          },
+          admin: bool(),
+        },
+      });
+
+      const user = userBuilder();
+      expect(user).toEqual({
+        details: {
+          name: expect.any(String),
+        },
+        admin: expect.any(Boolean),
+      });
     });
   });
 });

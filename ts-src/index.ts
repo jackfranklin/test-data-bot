@@ -11,8 +11,15 @@ interface FakerGenerator {
   call: (fake: Faker.FakerStatic) => any;
 }
 
-type FieldGenerator = FakerGenerator | SequenceGenerator;
-type Field = string | number | FieldGenerator;
+interface OneOfGenerator {
+  generatorType: 'oneOf';
+  options: any[];
+  call: <T>(options: T[]) => T;
+}
+
+type FieldGenerator = FakerGenerator | SequenceGenerator | OneOfGenerator;
+
+type Field = string | number | FieldGenerator | { [x: string]: Field };
 
 type FieldsConfiguration<FactoryResultType> = {
   readonly [x in keyof FactoryResultType]: Field
@@ -32,8 +39,10 @@ export const build = <FactoryResultType>(
 ): (() => FactoryResultType) => {
   let sequenceCounter = 0;
 
-  return () => {
-    const fieldsToReturn = mapValues(config.fields, fieldValue => {
+  const expandConfigFields = (
+    fields: FieldsConfiguration<FactoryResultType>
+  ): { [P in keyof FieldsConfiguration<FactoryResultType>]: any } => {
+    return mapValues(fields, fieldValue => {
       let calculatedValue;
 
       if (isGenerator(fieldValue)) {
@@ -48,17 +57,44 @@ export const build = <FactoryResultType>(
             calculatedValue = fieldValue.call(faker);
             break;
           }
+
+          case 'oneOf': {
+            calculatedValue = fieldValue.call(fieldValue.options);
+          }
         }
+      } else if (typeof fieldValue === 'object') {
+        const nestedFieldsObject = fieldValue as FieldsConfiguration<
+          FactoryResultType
+        >;
+
+        calculatedValue = expandConfigFields(nestedFieldsObject);
       } else {
         calculatedValue = fieldValue;
       }
 
       return calculatedValue;
     });
+  };
 
+  return () => {
+    const fieldsToReturn = expandConfigFields(config.fields);
     return fieldsToReturn;
   };
 };
+
+export const oneOf = <T>(...options: T[]): OneOfGenerator => {
+  return {
+    generatorType: 'oneOf',
+    options,
+    call: <T>(options: T[]): T => {
+      const randomIndex = Math.floor(Math.random() * options.length);
+
+      return options[randomIndex];
+    },
+  };
+};
+
+export const bool = (): OneOfGenerator => oneOf(true, false);
 
 export const sequence = (): SequenceGenerator => {
   return {
