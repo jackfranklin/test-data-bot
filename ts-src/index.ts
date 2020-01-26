@@ -19,11 +19,25 @@ interface OneOfGenerator {
 
 type FieldGenerator = FakerGenerator | SequenceGenerator | OneOfGenerator;
 
-type Field = string | number | FieldGenerator | { [x: string]: Field };
+type Field =
+  | string
+  | number
+  | FieldGenerator
+  | { [x: string]: Field | {} }
+  | any[];
 
 type FieldsConfiguration<FactoryResultType> = {
   readonly [x in keyof FactoryResultType]: Field
 };
+
+interface Overrides<FactoryResultType> {
+  [x: string]: Field;
+}
+
+interface BuildTimeConfig<FactoryResultType> {
+  overrides?: Overrides<FactoryResultType>;
+  map?: (builtThing: FactoryResultType) => FactoryResultType;
+}
 
 interface BuildConfiguration<FactoryResultType> {
   readonly fields: FieldsConfiguration<FactoryResultType>;
@@ -33,51 +47,73 @@ const isGenerator = (field: Field): field is FieldGenerator => {
   return (field as FieldGenerator).generatorType !== undefined;
 };
 
+type ValueOf<T> = T[keyof T];
+
 export const build = <FactoryResultType>(
   factoryName: string,
   config: BuildConfiguration<FactoryResultType>
-): (() => FactoryResultType) => {
+): ((
+  buildTimeConfig?: BuildTimeConfig<FactoryResultType>
+) => FactoryResultType) => {
   let sequenceCounter = 0;
 
   const expandConfigFields = (
-    fields: FieldsConfiguration<FactoryResultType>
+    fields: FieldsConfiguration<FactoryResultType>,
+    buildTimeConfig: BuildTimeConfig<FactoryResultType> = {}
   ): { [P in keyof FieldsConfiguration<FactoryResultType>]: any } => {
-    return mapValues(fields, fieldValue => {
-      let calculatedValue;
+    const finalBuiltThing = mapValues(fields, (fieldValue, fieldKey) => {
+      const overrides = buildTimeConfig.overrides || {};
 
-      if (isGenerator(fieldValue)) {
-        switch (fieldValue.generatorType) {
-          case 'sequence': {
-            ++sequenceCounter;
-            calculatedValue = fieldValue.call(sequenceCounter);
-            break;
-          }
+      const valueOrOverride = overrides[fieldKey] || fieldValue;
 
-          case 'faker': {
-            calculatedValue = fieldValue.call(faker);
-            break;
-          }
-
-          case 'oneOf': {
-            calculatedValue = fieldValue.call(fieldValue.options);
-          }
-        }
-      } else if (typeof fieldValue === 'object') {
-        const nestedFieldsObject = fieldValue as FieldsConfiguration<
-          FactoryResultType
-        >;
-
-        calculatedValue = expandConfigFields(nestedFieldsObject);
-      } else {
-        calculatedValue = fieldValue;
-      }
-
-      return calculatedValue;
+      /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
+      return expandConfigField(valueOrOverride);
     });
+
+    const mapFunc = buildTimeConfig.map || (x => x);
+    return mapFunc(finalBuiltThing);
   };
 
-  return () => {
-    const fieldsToReturn = expandConfigFields(config.fields);
+  const expandConfigField = (
+    fieldValue: ValueOf<FieldsConfiguration<FactoryResultType>>
+  ): any => {
+    let calculatedValue;
+
+    if (isGenerator(fieldValue)) {
+      switch (fieldValue.generatorType) {
+        case 'sequence': {
+          ++sequenceCounter;
+          calculatedValue = fieldValue.call(sequenceCounter);
+          break;
+        }
+
+        case 'faker': {
+          calculatedValue = fieldValue.call(faker);
+          break;
+        }
+
+        case 'oneOf': {
+          calculatedValue = fieldValue.call(fieldValue.options);
+        }
+      }
+    } else if (Array.isArray(fieldValue)) {
+      calculatedValue = fieldValue.map(v => expandConfigField(v));
+      return calculatedValue;
+    } else if (typeof fieldValue === 'object') {
+      const nestedFieldsObject = fieldValue as FieldsConfiguration<
+        FactoryResultType
+      >;
+
+      calculatedValue = expandConfigFields(nestedFieldsObject);
+    } else {
+      calculatedValue = fieldValue;
+    }
+
+    return calculatedValue;
+  };
+
+  return (buildTimeConfig = {}) => {
+    const fieldsToReturn = expandConfigFields(config.fields, buildTimeConfig);
     return fieldsToReturn;
   };
 };

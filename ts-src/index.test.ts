@@ -18,6 +18,23 @@ describe('test-data-bot', () => {
     });
   });
 
+  it('lets a value be overriden when building an instance', () => {
+    interface User {
+      name: string;
+    }
+
+    const userBuilder = build<User>('User', {
+      fields: {
+        name: fake(f => f.name.findName()),
+      },
+    });
+
+    const user = userBuilder({ overrides: { name: 'customName' } });
+    expect(user).toEqual({
+      name: 'customName',
+    });
+  });
+
   describe('sequence', () => {
     it('increments the sequence value per build', () => {
       interface User {
@@ -32,6 +49,43 @@ describe('test-data-bot', () => {
 
       const users = [userBuilder(), userBuilder()];
       expect(users).toEqual([{ id: 1 }, { id: 2 }]);
+    });
+  });
+
+  describe('mapping', () => {
+    it('lets you map over the generated object to fully customise it', () => {
+      interface User {
+        name: string;
+        sports: {
+          football: boolean;
+          rugby: boolean;
+        };
+      }
+
+      const userBuilder = build<User>('User', {
+        fields: {
+          name: fake(f => f.name.findName()),
+          sports: {
+            football: true,
+            rugby: false,
+          },
+        },
+      });
+
+      const user = userBuilder({
+        overrides: {
+          name: 'customName',
+        },
+        map: user => {
+          user.sports.rugby = true;
+          return user;
+        },
+      });
+      expect(user.name).toEqual('customName');
+      expect(user.sports).toEqual({
+        football: true,
+        rugby: true,
+      });
     });
   });
 
@@ -85,6 +139,90 @@ describe('test-data-bot', () => {
   });
 
   describe('nested objects', () => {
+    it('fully expands arrays', () => {
+      interface User {
+        friends: {
+          names: string[];
+        };
+      }
+
+      const userBuilder = build<User>('User', {
+        fields: {
+          friends: {
+            names: [fake(f => f.name.findName()), fake(f => f.name.findName())],
+          },
+        },
+      });
+
+      const user = userBuilder();
+      expect(user.friends.names).toEqual([
+        expect.any(String),
+        expect.any(String),
+      ]);
+    });
+
+    it('fully expands super nested awkward things', () => {
+      interface Friend {
+        name: string;
+        sports: {
+          [x: string]: boolean;
+        };
+      }
+
+      interface User {
+        name: string;
+        friends: {
+          names: Friend[];
+        };
+      }
+
+      const friendBuilder = build<Friend>('Friend', {
+        fields: {
+          name: fake(f => f.name.findName()),
+          sports: {
+            football: bool(),
+            basketball: false,
+            rugby: true,
+          },
+        },
+      });
+
+      const userBuilder = build<User>('User', {
+        fields: {
+          name: 'jack',
+          friends: [
+            friendBuilder({ overrides: { name: 'customName' } }),
+            friendBuilder({
+              overrides: {
+                sports: {
+                  rugby: false,
+                },
+              },
+            }),
+          ],
+        },
+      });
+
+      const user = userBuilder();
+      expect(user.name).toEqual('jack');
+      expect(user.friends).toEqual([
+        {
+          name: 'customName',
+          sports: {
+            football: expect.any(Boolean),
+            basketball: false,
+            rugby: true,
+          },
+        },
+        {
+          name: expect.any(String),
+          sports: {
+            rugby: false,
+          },
+        },
+      ]);
+    });
+
     it('fully expands objects to ensure all builders are executed', () => {
       interface User {
         details: {
