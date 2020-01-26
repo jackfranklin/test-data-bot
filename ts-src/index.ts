@@ -51,6 +51,7 @@ interface BuildTimeConfig<FactoryResultType> {
 
 interface BuildConfiguration<FactoryResultType> {
   readonly fields: FieldsConfiguration<FactoryResultType>;
+  readonly postBuild?: (x: FactoryResultType) => FactoryResultType;
 }
 
 const isGenerator = (field: Field): field is FieldGenerator => {
@@ -58,6 +59,8 @@ const isGenerator = (field: Field): field is FieldGenerator => {
 };
 
 type ValueOf<T> = T[keyof T];
+
+const identity = <T>(x: T): T => x;
 
 export const build = <FactoryResultType>(
   factoryName: string,
@@ -71,17 +74,21 @@ export const build = <FactoryResultType>(
     fields: FieldsConfiguration<FactoryResultType>,
     buildTimeConfig: BuildTimeConfig<FactoryResultType> = {}
   ): { [P in keyof FieldsConfiguration<FactoryResultType>]: any } => {
-    const finalBuiltThing = mapValues(fields, (fieldValue, fieldKey) => {
-      const overrides = buildTimeConfig.overrides || {};
+    const postBuild = config.postBuild || identity;
 
-      const valueOrOverride = overrides[fieldKey] || fieldValue;
+    const finalBuiltThing = postBuild(
+      mapValues(fields, (fieldValue, fieldKey) => {
+        const overrides = buildTimeConfig.overrides || {};
 
-      /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-      return expandConfigField(valueOrOverride);
-    });
+        const valueOrOverride = overrides[fieldKey] || fieldValue;
 
-    const mapFunc = buildTimeConfig.map || (x => x);
-    return mapFunc(finalBuiltThing);
+        /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
+        return expandConfigField(valueOrOverride);
+      })
+    );
+
+    const buildTimeMapFunc = buildTimeConfig.map || identity;
+    return buildTimeMapFunc(finalBuiltThing);
   };
 
   const expandConfigField = (

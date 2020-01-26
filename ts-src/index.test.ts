@@ -108,6 +108,77 @@ describe('test-data-bot', () => {
         rugby: true,
       });
     });
+
+    it('lets you define the map on the builder level as postBuild', () => {
+      interface User {
+        name: string;
+      }
+
+      const userBuilder = build<User>('User', {
+        postBuild: user => {
+          user.name = user.name.toUpperCase();
+          return user;
+        },
+        fields: {
+          name: perBuild(() => 'jack'),
+        },
+      });
+
+      const user = userBuilder();
+      expect(user.name).toEqual('JACK');
+    });
+
+    it('runs the postBuild function after applying overrides', () => {
+      interface User {
+        name: string;
+      }
+
+      const userBuilder = build<User>('User', {
+        postBuild: user => {
+          user.name = user.name.toUpperCase();
+          return user;
+        },
+        fields: {
+          name: fake(f => f.name.findName()),
+        },
+      });
+
+      const user = userBuilder({
+        overrides: {
+          name: 'jack',
+        },
+      });
+      expect(user.name).toEqual('JACK');
+    });
+
+    it('the build time map function runs after postBuild', () => {
+      expect.assertions(2);
+      interface User {
+        name: string;
+      }
+
+      const userBuilder = build<User>('User', {
+        postBuild: user => {
+          user.name = user.name.toUpperCase();
+          return user;
+        },
+        fields: {
+          name: fake(f => f.name.findName()),
+        },
+      });
+
+      const user = userBuilder({
+        overrides: {
+          name: 'jack',
+        },
+        map: user => {
+          expect(user.name).toEqual('JACK');
+          user.name = 'new name';
+          return user;
+        },
+      });
+      expect(user.name).toEqual('new name');
+    });
   });
 
   describe('fake', () => {
