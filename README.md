@@ -285,6 +285,10 @@ const newBuilder = newTestDataBot.build(...)
 
 ## Breaking changes in the new version
 
+### Node 10.13 is required
+
+Previously Node 8 was supported, but now the minimum is 10.13.
+
 ### API for declaring fields has changed
 
 Before:
