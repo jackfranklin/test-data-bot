@@ -1,4 +1,10 @@
-# test-data-bot
+# @jackfranklin/test-data-bot
+
+**IMPORTANT**: `@jackfranklin/test-data-bot` is the new version of this package, written in TypeScript and initially released as version 1.0.0.
+
+The old package, `test-data-bot` (_not scoped to my username on npm_) was last released as 0.8.0 and is not being updated any more. It is recommended to upgrade to 1.0.0, which has some breaking changes documented below.
+
+If you want to find the old documentation for `0.8.0`, you can [do so via an old README on GitHub](https://github.com/jackfranklin/test-data-bot/blob/c0fd856cbe8ea26024725aaca47e433fe727ddff/README.md).
 
 An easy way to generate test data for your JavaScript unit tests. Completely agnostic of test runner, framework or environment.
 
@@ -7,16 +13,16 @@ npm install --save-dev test-data-bot
 ```
 
 ```js
-const { build, fake, sequence } = require('test-data-bot')
+const { build, fake, sequence } = require('test-data-bot');
 
 const userBuilder = build('User').fields({
   name: fake(f => f.name.findName()),
   email: sequence(x => `jack${x}@test.com`),
   age: 26,
-})
+});
 
-const user = userBuilder()
-console.log(user)
+const user = userBuilder();
+console.log(user);
 // => { name: 'Bob Fleming', email: 'jack1@test.com', age: 26 }
 ```
 
@@ -51,11 +57,11 @@ const userBuilder = build('User')
   .map(user => ({
     name: user.name.toUpperCase(),
     email: user.email.toUpperCase(),
-  }))
+  }));
 
-const user = userBuilder()
+const user = userBuilder();
 
-console.log(user)
+console.log(user);
 // => { name: 'BOB FLEMING', email: 'JACK1@TEST.COM' }
 ```
 
@@ -67,11 +73,11 @@ Sometimes you might want to ensure a certain value, rather than use the generato
 const userBuilder = build('User').fields({
   name: fake(f => f.name.findName()),
   email: sequence(x => `jack${x}@test.com`),
-})
+});
 
-const user = userBuilder({ name: 'JACK' })
+const user = userBuilder({ name: 'JACK' });
 
-console.log(user)
+console.log(user);
 // => { name: 'JACK', email: 'jack1@test.com' }
 ```
 
