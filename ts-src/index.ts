@@ -11,13 +11,23 @@ interface FakerGenerator {
   call: (fake: Faker.FakerStatic) => any;
 }
 
+interface PerBuildGenerator {
+  generatorType: 'perBuild';
+  func: () => any;
+  call: (f: () => any) => any;
+}
+
 interface OneOfGenerator {
   generatorType: 'oneOf';
   options: any[];
   call: <T>(options: T[]) => T;
 }
 
-type FieldGenerator = FakerGenerator | SequenceGenerator | OneOfGenerator;
+type FieldGenerator =
+  | FakerGenerator
+  | SequenceGenerator
+  | OneOfGenerator
+  | PerBuildGenerator;
 
 type Field =
   | string
@@ -94,6 +104,12 @@ export const build = <FactoryResultType>(
 
         case 'oneOf': {
           calculatedValue = fieldValue.call(fieldValue.options);
+          break;
+        }
+
+        case 'perBuild': {
+          calculatedValue = fieldValue.call(fieldValue.func);
+          break;
         }
       }
     } else if (Array.isArray(fieldValue)) {
@@ -137,6 +153,16 @@ export const sequence = (): SequenceGenerator => {
     generatorType: 'sequence',
     call: (counter: number) => {
       return counter;
+    },
+  };
+};
+
+export const perBuild = <T>(func: () => T): PerBuildGenerator => {
+  return {
+    generatorType: 'perBuild',
+    func,
+    call: (f: () => T): T => {
+      return f();
     },
   };
 };

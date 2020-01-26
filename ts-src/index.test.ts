@@ -1,4 +1,4 @@
-import { build, sequence, fake, oneOf, bool } from './index';
+import { build, sequence, fake, oneOf, bool, perBuild } from './index';
 
 describe('test-data-bot', () => {
   it('can build an object with primitive values only', () => {
@@ -32,6 +32,27 @@ describe('test-data-bot', () => {
     const user = userBuilder({ overrides: { name: 'customName' } });
     expect(user).toEqual({
       name: 'customName',
+    });
+  });
+
+  describe('perBuild', () => {
+    it('generates a new object each time', () => {
+      interface User {
+        data: {};
+      }
+
+      const userBuilder = build<User>('User', {
+        fields: {
+          data: perBuild(() => ({})),
+        },
+      });
+
+      const user1 = userBuilder();
+      const user2 = userBuilder();
+
+      expect(user1.data).toEqual({});
+      expect(user2.data).toEqual({});
+      expect(user1.data).not.toBe(user2.data);
     });
   });
 
