@@ -1,6 +1,6 @@
 {
-  "name": "test-data-bot",
-  "version": "0.8.0",
+  "name": "@jackfranklin/test-data-bot",
+  "version": "1.0.0",
   "description": "Generate test data for your tests easily.",
   "engines": {
     "node": ">=10.13"
@@ -8,13 +8,17 @@
   "main": "src/index.js",
   "scripts": {
     "test": "yarn run lint && jest src",
-    "lint": "eslint --quiet 'src/*.ts' && prettier --list-different 'src/*.ts'"
+    "lint": "eslint --quiet 'src/*.ts' && prettier --list-different 'src/*.ts'",
+    "build": "tsc --build tsconfig.json"
   },
   "keywords": [
     "testing",
     "factory-bot",
     "fixtures",
     "test"
+  ],
+  "files": [
+    "build/"
   ],
   "author": "Jack Franklin",
   "homepage": "https://github.com/jackfranklin/test-data-bot#readme",
