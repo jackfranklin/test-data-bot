@@ -1,46 +1,363 @@
-# test-data-bot
+# @jackfranklin/test-data-bot
 
-An easy way to generate test data for your JavaScript unit tests. Completely agnostic of test runner, framework or environment.
+**IMPORTANT**: `@jackfranklin/test-data-bot` is the new version of this package, written in TypeScript and initially released as version 1.0.0.
+
+The old package, `test-data-bot` (_not scoped to my username on npm_) was last released as 0.8.0 and is not being updated any more. It is recommended to upgrade to 1.0.0, which has some breaking changes documented below.
+
+If you want to find the old documentation for `0.8.0`, you can [do so via an old README on GitHub](https://github.com/jackfranklin/test-data-bot/blob/c0fd856cbe8ea26024725aaca47e433fe727ddff/README.md).
+
+# Motivation and usage
+
+test-data-bot was inspired by [Factory Bot](https://github.com/thoughtbot/factory_bot), a Ruby library that makes it really easy to generate fake yet realistic looking data for your unit tests.
+
+Rather than creating random objects each time you want to test something in your system you can instead use a _factory_ that can create fake data. This keeps your tests consistent and means that they always use data that replicates the real thing. If your tests work off objects close to the real thing they are more useful and there's a higher chance of them finding bugs.
+
+_Rather than the term `factory`, test-data-bot uses `builder`._
+
+test-data-bot makes no assumptions about frameworks or libraries, and can be used with any test runner too. test-data-bot is written in TypeScript, so if you use that you'll get nice type safety (see the TypeScript section of this README) but you can use it in JavaScript with no problems.
 
 ```
-npm install --save-dev test-data-bot
+npm install --save-dev @jackfranklin/test-data-bot
+yarn add --dev @jackfranklin/test-data-bot
 ```
+
+## Creating your first builder
+
+We use the `build` function to create a builder. It takes a name for the object it will create, and then some fields:
 
 ```js
-const { build, fake, sequence } = require('test-data-bot')
+const { build } = require('test-data-bot');
 
-const userBuilder = build('User').fields({
-  name: fake(f => f.name.findName()),
-  email: sequence(x => `jack${x}@test.com`),
-  age: 26,
-})
+const userBuilder = build('User', {
+  fields: {
+    name: 'jack',
+  },
+});
 
-const user = userBuilder()
-console.log(user)
-// => { name: 'Bob Fleming', email: 'jack1@test.com', age: 26 }
+const user = userBuilder();
+console.log(user);
+// => { name: 'jack'}
 ```
 
-# API
+_While the examples in this README use `require`, you can also use `import {build} from '@jackfranklin/test-data-bot'`._
 
-Firstly, use `build` to create a new builder. The name passed is just for debugging/documentation purposes and can be whatever you'd like.
+Once you've created a builder, you can call it to generate an instance of that object - in this case, a `user`.
 
-Once you've created a builder, use `fields` to pass in the names and values of fields.
+It would be boring though if each user had the same `name` - so test-data-bot lets you generate data via some API methods:
 
-Field values can be one of:
+### FakerJS with `fake`
 
-- A static value, in which case any generated data from this builder will always use that value.
-- A call to `sequence`, which takes a function which is passed a number. This is an easy way to ensure a value is unique everytime, but still know what it will be. A sequence is per field, and the number starts at 1.
-- A call to `fake`. This takes a function that will be called with an instance of [faker.js](https://github.com/marak/Faker.js/), and you can use any of the [faker API methods](https://github.com/marak/Faker.js/#api-methods) to return data.
-- A call to `perBuild`. This takes a function that will be called each time an instance is created. This is useful if you want each instance to have the same actual value (say, an object), but one that isn't referentially the same.
-- A call to `incrementingId`. This will produce a number that starts at `1` and increments each time it is used. Good to model IDs from a database.
-- A call to `oneOf`. This takes any number of primitive values, and picks one at random.
-- A call to `arrayOf`. This takes any value (including another builder) and generates an array of them. It also takes the array `length` as the second argument: `arrayOf('foo', 2)` will generate `['foo', 'foo']`. `arrayOf(fake(f => f.name.findName()), 5)` will generate an array of 5 random names.
-- A call to `bool`. This is a shortcut for `oneOf(true, false)` and will pick one of them at random.
-- A call to `numberBetween`. This takes two arguments as min/max, and generates a random integer between them. `numberBetween(0, 10)` is a shortcut for `fake(f => f.random.number({ min: 0, max: 10 })`.
+test-data-bot provides an API for calling into [Faker.js](https://github.com/marak/Faker.js/) which is a library that lets you generate all sorts of fake data:
 
-## Mapping
+```js
+const { build, fake } = require('@jackfranklin/test-data-bot');
 
-The test-data-bot always creates plain JavaScript objects, but you may need to generate instances of a class, for example. In this instance, you can pass a `map` to the builder. This will be called with the generated object, and you can then do with that data whatever you'd like:
+const userBuilder = build('User', {
+  fields: {
+    name: fake(f => f.name.findName()),
+  },
+});
+
+const userOne = userBuilder();
+const userTwo = userBuilder();
+```
+
+Each user will have a random name as generated by the FakerJS library. You can use any of the Faker API methods that you'd like.
+
+### Incrementing IDs with `sequence`
+
+Often you will be creating objects that have an ID that comes from a database, so you need to guarantee that it's unique. You can use `sequence`, which increments every time it's called:
+
+```js
+const { build, sequence } = require('@jackfranklin/test-data-bot');
+
+const userBuilder = build('User', {
+  fields: {
+    id: sequence(),
+  },
+});
+
+const userOne = userBuilder();
+const userTwo = userBuilder();
+
+// userOne.id === 1
+// userTwo.id === 2
+```
+
+If you need more control, you can pass `sequence` a function that will be called with the number. This is useful to ensure completely unique emails, for example:
+
+```js
+const { build, sequence } = require('@jackfranklin/test-data-bot');
+
+const userBuilder = build('User', {
+  fields: {
+    email: sequence(x => `jack${x}@gmail.com`),
+  },
+});
+
+const userOne = userBuilder();
+const userTwo = userBuilder();
+
+// userOne.email === jack1@gmail.com
+// userTwo.email === jack2@gmail.com
+```
+
+### Randomly picking between an option
+
+If you want an object to have a random value, picked from a list you control, you can use `oneOf`:
+
+```js
+const { build, oneOf } = require('@jackfranklin/test-data-bot');
+
+const userBuilder = build('User', {
+  fields: {
+    name: oneOf('alice', 'bob', 'charlie'),
+  },
+});
+```
+
+### `bool`
+
+If you need something to be either `true` or `false`, you can use `bool`:
+
+```js
+const { build, bool } = require('@jackfranklin/test-data-bot');
+
+const userBuilder = build('User', {
+  fields: {
+    isAdmin: bool(),
+  },
+});
+```
+
+### `perBuild`
+
+test-data-bot lets you declare a field to always be a particular value:
+
+```js
+const { build, perBuild } = require('@jackfranklin/test-data-bot');
+
+const userBuilder = build('User', {
+  fields: {
+    name: 'jack',
+    details: {},
+  },
+});
+```
+
+A user generated from this builder will always the same data. However, if you generate two users using the builder above, they will have _exactly the same object_ for the `details` key:
+
+```js
+const userOne = userBuilder();
+const userTwo = userBuilder();
+
+userOne.details === userTwo.details; // true
+```
+
+If you want to generate a unique object every time, you can use `perBuild` which takes a function and executes it when a builder is built:
+
+```js
+const { build, perBuild } = require('@jackfranklin/test-data-bot');
+
+const userBuilder = build('User', {
+  fields: {
+    name: 'jack',
+    details: perBuild(() => {
+      return {};
+    }),
+  },
+});
+
+const userOne = userBuilder();
+const userTwo = userBuilder();
+
+userOne.details === userTwo.details; // false
+```
+
+### Mapping over all the created objects with `postBuild`
+
+If you need to transform an object in a way that test-data-bot doesn't support out the box, you can pass a `postBuild` function when creating a builder. This builder will run everytime you create an object from it.
+
+```js
+const { build, fake } = require('@jackfranklin/test-data-bot');
+
+const userBuilder = build('User', {
+  fields: {
+    name: fake(f => f.name.findName()),
+  },
+  postBuild: user => {
+    user.name = user.name.toUpperCase();
+    return user;
+  },
+});
+
+const user = userBuilder();
+// user.name will be uppercase
+```
+
+## Overrides per-build
+
+You'll often need to generate a random object but control one of the values directly for the purpose of testing. When you call a builder you can pass in overrides which will override the builder defaults:
+
+```js
+const { build, fake } = require('@jackfranklin/test-data-bot');
+
+const userBuilder = build('User', {
+  fields: {
+    id: sequence(),
+    name: fake(f => f.name.findName()),
+  },
+});
+
+const user = userBuilder({
+  overrides: {
+    id: 1,
+    name: 'jack',
+  },
+});
+
+// user.id === 1
+// user.name === 'jack'
+```
+
+If you need to edit the object directly, you can pass in a `map` function when you call the builder:
+
+```js
+const { build, fake } = require('@jackfranklin/test-data-bot');
+
+const userBuilder = build('User', {
+  fields: {
+    id: sequence(),
+    name: fake(f => f.name.findName()),
+  },
+});
+
+const user = userBuilder({
+  map: user => {
+    user.name = user.name.toUpperCase();
+    return user;
+  },
+});
+```
+
+Using `overrides` and `map` lets you easily customise a specific object that a builder has created.
+
+## TypeScript support
+
+test-data-bot is written in TypeScript and ships with the types generated so if you're using TypeScript you will get some nice type support out the box.
+
+The builders are generic, so you can describe to test-data-bot exactly what object you're creating:
+
+```ts
+interface User {
+  id: number;
+  name: string;
+}
+
+const userBuilder = build<User>('User', {
+  fields: {
+    id: sequence(),
+    name: fake(f => f.name.findName()),
+  },
+});
+
+const users = userBuilder();
+```
+
+You should get TypeScript errors if the builder doesn't satisfy the interface you've given it.
+
+_I'm still quite new to TypeScript so please let me know if you don't get the errors/type hints that you expect!_
+
+# Migrating from `test-data-bot@0.8.0` to `@jackfranklin/test-data-bot@1.0.0`
+
+Firstly: there is no need to migrate immediately if the old version is doing the job for you - but it won't be improved or have bug fixes so it's recommended to migrate slowly to 1.0.0.
+
+You can also run both versions at the same time - they won't conflict. Just make sure you rename the API methods or import everything:
+
+```js
+const legacyTestDataBot = require('test-data-bot')
+const newTestDataBot = require('@jackfranklin/test-data-bot')
+
+const oldBuilder = legacyTestDataBot.build(...)
+
+const newBuilder = newTestDataBot.build(...)
+```
+
+## Breaking changes in the new version
+
+### API for declaring fields has changed
+
+Before:
+
+```js
+const userBuilder = build('User').fields({
+  name: fake(f => f.name.findName()),
+});
+```
+
+After:
+
+```js
+const userBuilder = build('User', {
+  fields: {
+    name: fake(f => f.name.findName()),
+  },
+});
+```
+
+### `numberBetween` has been removed
+
+`numberBetween` was a shortcut around `fake`. If you need it back you can easily define it:
+
+```js
+const { fake } = require('@jackfranklin/test-data-bot');
+const numberBetween = (min, max) => fake(f => f.random.number({ min, max }));
+```
+
+It's highly recommended to maintain a library of custom matchers that are useful for your application.
+
+### `incrementingId` has been removed
+
+You can now call `sequence()` with no argument to get the same result:
+
+Before:
+
+```js
+id: incrementingId();
+```
+
+After:
+
+```js
+id: sequence();
+```
+
+### `arrayOf` has been removed
+
+It was hard to provide a nice API for `arrayOf` that supported all cases. It's now recommended to use the `postBuild` function if you always want an object to have an array of things:
+
+```js
+const blogPostBuilder = build('BlogPost', {...})
+
+const userBuilder = build('User', {
+  fields: {
+    name: fake(f => f.name.findName()),
+    blogPosts: [],
+  },
+  postBuild: user => {
+    user.blogPosts = Array(3).fill(undefined).map(_ => blogPostBuilder())
+    return user
+  }
+});
+```
+
+### The `map` function has been removed
+
+The old version of test-data-bot provided a map function on each object that it generated. This was confusing and awkward as it meant test-data-bot placed a `map` function on generated objects. If your object had a `map` property, it would be overriden!
+
+This is now replaced by the `postBuild` function.
+
+Before:
 
 ```js
 const userBuilder = build('User')
@@ -51,28 +368,20 @@ const userBuilder = build('User')
   .map(user => ({
     name: user.name.toUpperCase(),
     email: user.email.toUpperCase(),
-  }))
-
-const user = userBuilder()
-
-console.log(user)
-// => { name: 'BOB FLEMING', email: 'JACK1@TEST.COM' }
+  }));
 ```
 
-## Hard coding values and overriding
-
-Sometimes you might want to ensure a certain value, rather than use the generator. In this case you can pass it in when you call the builder:
+After:
 
 ```js
-const userBuilder = build('User').fields({
-  name: fake(f => f.name.findName()),
-  email: sequence(x => `jack${x}@test.com`),
-})
-
-const user = userBuilder({ name: 'JACK' })
-
-console.log(user)
-// => { name: 'JACK', email: 'jack1@test.com' }
+const userBuilder = build('User', {
+  fields: {
+    name: fake(f => f.name.findName()),
+    email: sequence(x => `jack${x}@test.com`),
+  },
+  postBuild: user => ({
+    name: user.name.toUpperCase(),
+    email: user.email.toUpperCase(),
+  }),
+});
 ```
-
-In this case, `name` will always be `'JACK'`, and the generator given will not be used.

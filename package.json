@@ -1,20 +1,24 @@
 {
-  "name": "test-data-bot",
-  "version": "0.8.0",
+  "name": "@jackfranklin/test-data-bot",
+  "version": "1.0.0",
   "description": "Generate test data for your tests easily.",
   "engines": {
-    "node": ">=8.10.0"
+    "node": ">=10.13"
   },
   "main": "src/index.js",
   "scripts": {
-    "test": "yarn run lint && jest",
-    "lint": "eslint 'src/*.js' && prettier --list-different 'src/*.js'"
+    "test": "jest src",
+    "lint": "eslint --quiet 'src/*.ts' && prettier --list-different 'src/*.ts'",
+    "build": "tsc --build tsconfig.json"
   },
   "keywords": [
     "testing",
     "factory-bot",
     "fixtures",
     "test"
+  ],
+  "files": [
+    "build/"
   ],
   "author": "Jack Franklin",
   "homepage": "https://github.com/jackfranklin/test-data-bot#readme",
@@ -25,15 +29,24 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "eslint": "6.8.0",
-    "eslint-config-prettier": "6.10.0",
-    "eslint-config-unobtrusive": "1.2.5",
-    "eslint-plugin-jest": "23.6.0",
-    "eslint-plugin-prettier": "3.1.2",
-    "jest": "24.9.0",
-    "prettier": "1.18.2"
+    "@types/faker": "^4.1.9",
+    "@types/jest": "^25.1.1",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^13.5.2",
+    "@typescript-eslint/eslint-plugin": "^2.18.0",
+    "@typescript-eslint/parser": "^2.18.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-config-unobtrusive": "^1.2.5",
+    "eslint-plugin-jest": "^23.6.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "jest": "^25.1.0",
+    "prettier": "^1.19.1",
+    "ts-jest": "^25.1.0",
+    "typescript": "^3.7.5"
   },
   "dependencies": {
-    "faker": "4.1.0"
+    "faker": "4.1.0",
+    "lodash": "^4.17.15"
   }
 }
