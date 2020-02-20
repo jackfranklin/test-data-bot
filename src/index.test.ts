@@ -18,6 +18,29 @@ describe('test-data-bot', () => {
     });
   });
 
+  it('accepts null and undefined values', () => {
+    interface User {
+      name: string;
+      age: number;
+      city: string;
+    }
+
+    const userBuilder = build<User>('User', {
+      fields: {
+        name: 'jack',
+        age: null,
+        city: undefined,
+      },
+    });
+
+    const user = userBuilder();
+    expect(user).toEqual(
+      expect.objectContaining({
+        name: 'jack',
+      })
+    );
+  });
+
   it('lets a value be overriden when building an instance', () => {
     interface User {
       name: string;
