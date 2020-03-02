@@ -355,5 +355,43 @@ describe('test-data-bot', () => {
         admin: expect.any(Boolean),
       });
     });
+
+    it('does not call postBuild on nested objects', () => {
+      expect.assertions(1);
+      interface User {
+        name: string;
+        sports: {
+          football: boolean;
+          basketball: boolean;
+          rugby: boolean;
+        };
+      }
+
+      const userBuilder = build<User>('User', {
+        postBuild: user => ({
+          ...user,
+          name: 'new name',
+        }),
+        fields: {
+          name: 'old name',
+          sports: {
+            football: true,
+            basketball: false,
+            rugby: true,
+          },
+        },
+      });
+
+      const user = userBuilder();
+
+      expect(user).toEqual({
+        name: 'new name',
+        sports: {
+          football: true,
+          basketball: false,
+          rugby: true,
+        },
+      });
+    });
   });
 });
