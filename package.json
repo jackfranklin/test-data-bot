@@ -1,6 +1,7 @@
 {
   "name": "@jackfranklin/test-data-bot",
   "version": "1.0.0",
+  "license": "MIT',
   "description": "Generate test data for your tests easily.",
   "engines": {
     "node": ">=10.13"
