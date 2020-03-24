@@ -30,7 +30,7 @@ yarn add --dev @jackfranklin/test-data-bot
 We use the `build` function to create a builder. It takes a name for the object it will create, and then some fields:
 
 ```js
-const { build } = require('test-data-bot');
+const { build } = require('@jackfranklin/test-data-bot');
 
 const userBuilder = build('User', {
   fields: {
