@@ -142,6 +142,20 @@ describe('test-data-bot', () => {
       expect(users).toEqual([{ id: 1 }, { id: 2 }]);
     });
 
+    it('can take a function that returns a string', () => {
+      interface User {
+        id: string;
+      }
+
+      const userBuilder = build<User>('User', {
+        fields: {
+          id: sequence((x) => `jack${x}@gmail.com`),
+        },
+      });
+
+      const user = userBuilder();
+      expect(user).toEqual({ id: 'jack1@gmail.com' });
+    });
     it('can take a function to return a number', () => {
       interface User {
         id: number;
