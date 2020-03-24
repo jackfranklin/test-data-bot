@@ -1,13 +1,12 @@
 import * as faker from 'faker';
 import { mapValues } from 'lodash';
 
+type SequenceFunction = (counter: number) => unknown;
+
 interface SequenceGenerator {
   generatorType: 'sequence';
-  userProvidedFunction: (counter: number) => number;
-  call: (
-    userProvidedFunction: (counter: number) => number,
-    counter: number
-  ) => number;
+  userProvidedFunction: SequenceFunction;
+  call: (userProvidedFunction: SequenceFunction, counter: number) => unknown;
 }
 
 interface FakerGenerator {
@@ -163,15 +162,12 @@ export const oneOf = <T>(...options: T[]): OneOfGenerator => {
 export const bool = (): OneOfGenerator => oneOf(true, false);
 
 export const sequence = (
-  userProvidedFunction: (counter: number) => number = (x) => x
+  userProvidedFunction: SequenceFunction = (x) => x
 ): SequenceGenerator => {
   return {
     generatorType: 'sequence',
     userProvidedFunction,
-    call: (
-      userProvidedFunction: (counter: number) => number,
-      counter: number
-    ) => {
+    call: (userProvidedFunction: SequenceFunction, counter: number) => {
       return userProvidedFunction(counter);
     },
   };
