@@ -32,7 +32,6 @@
     "url": "https://github.com/jackfranklin/test-data-bot.git"
   },
   "devDependencies": {
-    "@types/faker": "^4.1.9",
     "@types/jest": "^25.1.1",
     "@types/lodash": "^4.14.149",
     "@types/node": "^13.5.2",
@@ -49,6 +48,7 @@
     "typescript": "^3.7.5"
   },
   "dependencies": {
+    "@types/faker": "^4.1.9",
     "faker": "4.1.0",
     "lodash": "^4.17.15"
   }
