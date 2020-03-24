@@ -25,7 +25,7 @@ describe('test-data-bot', () => {
 
     const userBuilder = build<User>('User', {
       fields: {
-        name: fake(f => f.name.findName()),
+        name: fake((f) => f.name.findName()),
       },
     });
 
@@ -79,7 +79,7 @@ describe('test-data-bot', () => {
 
       const userBuilder = build<User>('User', {
         fields: {
-          id: sequence(x => x * 10),
+          id: sequence((x) => x * 10),
         },
       });
 
@@ -100,7 +100,7 @@ describe('test-data-bot', () => {
 
       const userBuilder = build<User>('User', {
         fields: {
-          name: fake(f => f.name.findName()),
+          name: fake((f) => f.name.findName()),
           sports: {
             football: true,
             rugby: false,
@@ -112,7 +112,7 @@ describe('test-data-bot', () => {
         overrides: {
           name: 'customName',
         },
-        map: user => {
+        map: (user) => {
           user.sports.rugby = true;
           return user;
         },
@@ -130,7 +130,7 @@ describe('test-data-bot', () => {
       }
 
       const userBuilder = build<User>('User', {
-        postBuild: user => {
+        postBuild: (user) => {
           user.name = user.name.toUpperCase();
           return user;
         },
@@ -149,12 +149,12 @@ describe('test-data-bot', () => {
       }
 
       const userBuilder = build<User>('User', {
-        postBuild: user => {
+        postBuild: (user) => {
           user.name = user.name.toUpperCase();
           return user;
         },
         fields: {
-          name: fake(f => f.name.findName()),
+          name: fake((f) => f.name.findName()),
         },
       });
 
@@ -173,12 +173,12 @@ describe('test-data-bot', () => {
       }
 
       const userBuilder = build<User>('User', {
-        postBuild: user => {
+        postBuild: (user) => {
           user.name = user.name.toUpperCase();
           return user;
         },
         fields: {
-          name: fake(f => f.name.findName()),
+          name: fake((f) => f.name.findName()),
         },
       });
 
@@ -186,7 +186,7 @@ describe('test-data-bot', () => {
         overrides: {
           name: 'jack',
         },
-        map: user => {
+        map: (user) => {
           expect(user.name).toEqual('JACK');
           user.name = 'new name';
           return user;
@@ -204,7 +204,7 @@ describe('test-data-bot', () => {
 
       const userBuilder = build<User>('User', {
         fields: {
-          name: fake(f => f.name.findName()),
+          name: fake((f) => f.name.findName()),
         },
       });
 
@@ -256,7 +256,10 @@ describe('test-data-bot', () => {
       const userBuilder = build<User>('User', {
         fields: {
           friends: {
-            names: [fake(f => f.name.findName()), fake(f => f.name.findName())],
+            names: [
+              fake((f) => f.name.findName()),
+              fake((f) => f.name.findName()),
+            ],
           },
         },
       });
@@ -285,7 +288,7 @@ describe('test-data-bot', () => {
 
       const friendBuilder = build<Friend>('Friend', {
         fields: {
-          name: fake(f => f.name.findName()),
+          name: fake((f) => f.name.findName()),
           sports: {
             football: bool(),
             basketball: false,
@@ -341,7 +344,7 @@ describe('test-data-bot', () => {
       const userBuilder = build<User>('User', {
         fields: {
           details: {
-            name: fake(f => f.name.findName()),
+            name: fake((f) => f.name.findName()),
           },
           admin: bool(),
         },
