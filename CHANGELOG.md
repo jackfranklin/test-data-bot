@@ -1,3 +1,17 @@
+### 1.1.0 - 23 March 2020
+
+- Fix: builders can now take literal `null` or `undefined` values: https://github.com/jackfranklin/test-data-bot/pull/198
+- Fix: `sequence` returns `unknown` not `number`: https://github.com/jackfranklin/test-data-bot/pull/196
+- Fix: ship Faker types for nice type hinting:  https://github.com/jackfranklin/test-data-bot/pull/197
+- Upgrade to Prettier 2: https://github.com/jackfranklin/test-data-bot/pull/195
+- Swap from `yarn` to `npm`: https://github.com/jackfranklin/test-data-bot/pull/194
+
+
+### 1.0.0 - 26 January 2020
+
+- Completely new version! See README for migration details.
+
+
 ### 0.8.0 - 04 March 2019
 
 - Add `numberBetween` - [PR by @spilist](https://github.com/jackfranklin/test-data-bot/pull/43).
