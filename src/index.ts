@@ -127,7 +127,7 @@ export const build = <FactoryResultType>(
         }
       }
     } else if (Array.isArray(fieldValue)) {
-      calculatedValue = fieldValue.map(v => expandConfigField(v));
+      calculatedValue = fieldValue.map((v) => expandConfigField(v));
       return calculatedValue;
     } else if (typeof fieldValue === 'object') {
       const nestedFieldsObject = fieldValue as FieldsConfiguration<
@@ -163,7 +163,7 @@ export const oneOf = <T>(...options: T[]): OneOfGenerator => {
 export const bool = (): OneOfGenerator => oneOf(true, false);
 
 export const sequence = (
-  userProvidedFunction: (counter: number) => number = x => x
+  userProvidedFunction: (counter: number) => number = (x) => x
 ): SequenceGenerator => {
   return {
     generatorType: 'sequence',
@@ -192,7 +192,7 @@ type FakerUserArgs = (fake: Faker.FakerStatic) => any;
 export const fake = (userDefinedUsage: FakerUserArgs): FakerGenerator => {
   return {
     generatorType: 'faker',
-    call: faker => {
+    call: (faker) => {
       return userDefinedUsage(faker);
     },
   };

@@ -10,6 +10,7 @@
   "scripts": {
     "test": "jest src",
     "lint": "eslint --quiet 'src/*.ts' && prettier --list-different 'src/*.ts'",
+    "lint-fix": "eslint --quiet --fix 'src/*.ts' && prettier --write 'src/*.ts'",
     "build": "tsc --build tsconfig.json",
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint && npm run test"
@@ -43,7 +44,7 @@
     "eslint-plugin-jest": "^23.6.0",
     "eslint-plugin-prettier": "^3.1.2",
     "jest": "^25.1.0",
-    "prettier": "^1.19.1",
+    "prettier": "^2.0.2",
     "ts-jest": "^25.1.0",
     "typescript": "^3.7.5"
   },
