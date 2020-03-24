@@ -132,8 +132,10 @@ export const build = <FactoryResultType>(
     } else if (Array.isArray(fieldValue)) {
       calculatedValue = fieldValue.map((v) => expandConfigField(v));
       return calculatedValue;
-    } else if (fieldValue === null) {
-      calculatedValue = null;
+    } else if (fieldValue === null || fieldValue === undefined) {
+      // has to be before typeof fieldValue === 'object'
+      // as typeof null === 'object'
+      calculatedValue = fieldValue;
     } else if (typeof fieldValue === 'object') {
       const nestedFieldsObject = fieldValue as FieldsConfiguration<
         FactoryResultType
