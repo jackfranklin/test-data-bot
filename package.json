@@ -30,7 +30,6 @@
     "type": "git",
     "url": "https://github.com/jackfranklin/test-data-bot.git"
   },
-  "license": "MIT",
   "devDependencies": {
     "@types/faker": "^4.1.9",
     "@types/jest": "^25.1.1",
