@@ -18,6 +18,76 @@ describe('test-data-bot', () => {
     });
   });
 
+  it('lets you pass null in as a value', () => {
+    interface User {
+      name: string | null;
+    }
+
+    const userBuilder = build<User>('User', {
+      fields: {
+        name: null,
+      },
+    });
+
+    const user = userBuilder();
+    expect(user).toEqual({
+      name: null,
+    });
+  });
+
+  it('lets you pass undefined in as a value', () => {
+    interface User {
+      name?: string;
+    }
+
+    const userBuilder = build<User>('User', {
+      fields: {
+        name: undefined,
+      },
+    });
+
+    const user = userBuilder();
+    expect(user).toEqual({
+      name: undefined,
+    });
+  });
+
+  it('supports nulls in nested builders', () => {
+    interface Address {
+      street1: string;
+      street2: string | null;
+      city: string;
+      state: string;
+      zipCode: string;
+    }
+    interface Company {
+      id: string;
+      name: string;
+      mailingAddress: Address;
+    }
+
+    const addressBuilder = build<Address>('Address', {
+      fields: {
+        street1: fake((f) => f.address.streetAddress()),
+        street2: null,
+        city: fake((f) => f.address.city()),
+        state: fake((f) => f.address.state()),
+        zipCode: fake((f) => f.address.zipCode()),
+      },
+    });
+
+    const companyBuilder = build<Company>('Company', {
+      fields: {
+        id: '123',
+        name: 'Test',
+        mailingAddress: perBuild(addressBuilder),
+      },
+    });
+
+    const company = companyBuilder();
+    expect(company.mailingAddress.street2).toEqual(null);
+  });
+
   it('lets a value be overriden when building an instance', () => {
     interface User {
       name: string;
