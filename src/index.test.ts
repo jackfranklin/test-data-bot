@@ -18,6 +18,23 @@ describe('test-data-bot', () => {
     });
   });
 
+  it('lets you pass null in as a value', () => {
+    interface User {
+      name: string | null;
+    }
+
+    const userBuilder = build<User>('User', {
+      fields: {
+        name: null,
+      },
+    });
+
+    const user = userBuilder();
+    expect(user).toEqual({
+      name: null,
+    });
+  });
+
   it('lets a value be overriden when building an instance', () => {
     interface User {
       name: string;

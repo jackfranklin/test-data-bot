@@ -36,6 +36,7 @@ type FieldGenerator =
 type Field =
   | string
   | number
+  | null
   | FieldGenerator
   | { [x: string]: Field | {} }
   | any[];
@@ -59,6 +60,8 @@ interface BuildConfiguration<FactoryResultType> {
 }
 
 const isGenerator = (field: Field): field is FieldGenerator => {
+  if (!field) return false;
+
   return (field as FieldGenerator).generatorType !== undefined;
 };
 
@@ -129,6 +132,8 @@ export const build = <FactoryResultType>(
     } else if (Array.isArray(fieldValue)) {
       calculatedValue = fieldValue.map((v) => expandConfigField(v));
       return calculatedValue;
+    } else if (fieldValue === null) {
+      calculatedValue = null;
     } else if (typeof fieldValue === 'object') {
       const nestedFieldsObject = fieldValue as FieldsConfiguration<
         FactoryResultType
