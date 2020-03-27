@@ -80,21 +80,16 @@ export const build = <FactoryResultType>(
     fields: FieldsConfiguration<FactoryResultType>,
     buildTimeConfig: BuildTimeConfig<FactoryResultType> = {}
   ): { [P in keyof FieldsConfiguration<FactoryResultType>]: any } => {
-    const postBuild = config.postBuild || identity;
+    const finalBuiltThing = mapValues(fields, (fieldValue, fieldKey) => {
+      const overrides = buildTimeConfig.overrides || {};
 
-    const finalBuiltThing = postBuild(
-      mapValues(fields, (fieldValue, fieldKey) => {
-        const overrides = buildTimeConfig.overrides || {};
+      const valueOrOverride = overrides[fieldKey] || fieldValue;
 
-        const valueOrOverride = overrides[fieldKey] || fieldValue;
+      /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
+      return expandConfigField(valueOrOverride);
+    });
 
-        /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-        return expandConfigField(valueOrOverride);
-      })
-    );
-
-    const buildTimeMapFunc = buildTimeConfig.map || identity;
-    return buildTimeMapFunc(finalBuiltThing);
+    return finalBuiltThing;
   };
 
   const expandConfigField = (
@@ -150,7 +145,10 @@ export const build = <FactoryResultType>(
 
   return (buildTimeConfig = {}) => {
     const fieldsToReturn = expandConfigFields(config.fields, buildTimeConfig);
-    return fieldsToReturn;
+    const postBuild = config.postBuild || identity;
+    const buildTimeMapFunc = buildTimeConfig.map || identity;
+
+    return buildTimeMapFunc(postBuild(fieldsToReturn));
   };
 };
 
