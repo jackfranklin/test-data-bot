@@ -69,11 +69,15 @@ type ValueOf<T> = T[keyof T];
 const identity = <T>(x: T): T => x;
 
 export const build = <FactoryResultType>(
-  factoryName: string,
-  config: BuildConfiguration<FactoryResultType>
+  factoryNameOrConfig: string | BuildConfiguration<FactoryResultType>,
+  configObject?: BuildConfiguration<FactoryResultType>
 ): ((
   buildTimeConfig?: BuildTimeConfig<FactoryResultType>
 ) => FactoryResultType) => {
+  const config = (typeof factoryNameOrConfig === 'string'
+    ? configObject
+    : factoryNameOrConfig) as BuildConfiguration<FactoryResultType>;
+
   let sequenceCounter = 0;
 
   const expandConfigFields = (

@@ -1,6 +1,23 @@
 import { build, sequence, fake, oneOf, bool, perBuild } from './index';
 
 describe('test-data-bot', () => {
+  it('can build an object with no name', () => {
+    interface User {
+      name: string;
+    }
+
+    const userBuilder = build<User>({
+      fields: {
+        name: 'jack',
+      },
+    });
+
+    const user = userBuilder();
+    expect(user).toEqual({
+      name: 'jack',
+    });
+  });
+
   it('can build an object with primitive values only', () => {
     interface User {
       name: string;
