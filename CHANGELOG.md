@@ -1,3 +1,14 @@
+### 1.2.0 - 09 May 2020
+
+- Factories now do not need a factory name property. You can simply pass in the configuration object :
+  ```js
+  const userBuilder = build({ ... });
+  // rather than:
+  const userBuilder = build('User', { ... });
+  ```
+
+  You can still pass a name if you like, but it's not required and will probably be removed in a future major version.
+
 ### 1.1.0 - 23 March 2020
 
 - Fix: builders can now take literal `null` or `undefined` values: https://github.com/jackfranklin/test-data-bot/pull/198
