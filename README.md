@@ -27,7 +27,7 @@ yarn add --dev @jackfranklin/test-data-bot
 
 ## Creating your first builder
 
-We use the `build` function to create a builder. It takes a name for the object it will create, and then some fields:
+We use the `build` function to create a builder. You give a builder an object of fields you want to define:
 
 ```js
 const { build } = require('@jackfranklin/test-data-bot');
@@ -44,6 +44,18 @@ console.log(user);
 ```
 
 _While the examples in this README use `require`, you can also use `import {build} from '@jackfranklin/test-data-bot'`._
+
+**Note**: if you're using *Version 1.2 or higher* you can leave the name of the factory and pass in only the configuration object:
+
+```js
+const userBuilder = build({
+  fields: {
+    name: 'jack',
+  },
+});
+```
+
+Feel free to use the name property if you like, but it's not used for anything in test-data-bot. It will probably get removed in a future major version.
 
 Once you've created a builder, you can call it to generate an instance of that object - in this case, a `user`.
 
