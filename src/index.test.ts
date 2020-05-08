@@ -455,7 +455,7 @@ describe('test-data-bot', () => {
       }
 
       const userBuilder = build<User>('User', {
-        postBuild: user => ({
+        postBuild: (user) => ({
           ...user,
           name: 'new name',
         }),
