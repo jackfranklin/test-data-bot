@@ -11,6 +11,7 @@ module.exports = {
     'prettier/prettier': ['error'],
     '@typescript-eslint/indent': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
 
     // rules from eslint-plugin-jest
     'jest/no-disabled-tests': 'error',

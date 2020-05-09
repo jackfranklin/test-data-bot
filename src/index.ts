@@ -51,10 +51,19 @@ interface Overrides<FactoryResultType> {
 interface BuildTimeConfig<FactoryResultType> {
   overrides?: Overrides<FactoryResultType>;
   map?: (builtThing: FactoryResultType) => FactoryResultType;
+  traits?: string | string[];
+}
+
+interface TraitsConfiguration<FactoryResultType> {
+  readonly [traitName: string]: {
+    overrides?: Overrides<FactoryResultType>;
+    postBuild?: (builtThing: FactoryResultType) => FactoryResultType;
+  };
 }
 
 interface BuildConfiguration<FactoryResultType> {
   readonly fields: FieldsConfiguration<FactoryResultType>;
+  readonly traits?: TraitsConfiguration<FactoryResultType>;
   readonly postBuild?: (x: FactoryResultType) => FactoryResultType;
 }
 
@@ -67,6 +76,13 @@ const isGenerator = (field: Field): field is FieldGenerator => {
 type ValueOf<T> = T[keyof T];
 
 const identity = <T>(x: T): T => x;
+
+const buildTimeTraitsArray = <FactoryResultType>(
+  buildTimeConfig: BuildTimeConfig<FactoryResultType>
+): string[] => {
+  const { traits = [] } = buildTimeConfig;
+  return Array.isArray(traits) ? traits : [traits];
+};
 
 export const build = <FactoryResultType>(
   factoryNameOrConfig: string | BuildConfiguration<FactoryResultType>,
@@ -87,7 +103,23 @@ export const build = <FactoryResultType>(
     const finalBuiltThing = mapValues(fields, (fieldValue, fieldKey) => {
       const overrides = buildTimeConfig.overrides || {};
 
-      const valueOrOverride = overrides[fieldKey] || fieldValue;
+      const traitsArray = buildTimeTraitsArray(buildTimeConfig);
+
+      const traitOverrides: Overrides<FactoryResultType> = traitsArray.reduce<
+        Overrides<FactoryResultType>
+      >((overrides, currentTraitKey) => {
+        const hasTrait = config.traits && config.traits[currentTraitKey];
+        if (!hasTrait) {
+          console.warn(`Warning: trait '${currentTraitKey}' not found.`);
+        }
+        const traitsConfig = config.traits
+          ? config.traits[currentTraitKey]
+          : {};
+        return { ...overrides, ...(traitsConfig.overrides || {}) };
+      }, {});
+
+      const valueOrOverride =
+        overrides[fieldKey] || traitOverrides[fieldKey] || fieldValue;
 
       /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
       return expandConfigField(valueOrOverride);
@@ -149,10 +181,24 @@ export const build = <FactoryResultType>(
 
   return (buildTimeConfig = {}) => {
     const fieldsToReturn = expandConfigFields(config.fields, buildTimeConfig);
+
+    const traitsArray = buildTimeTraitsArray(buildTimeConfig);
+    const traitPostBuilds = traitsArray.map((traitName) => {
+      const traitConfig = (config.traits && config.traits[traitName]) || {};
+      const postBuild = traitConfig.postBuild || identity;
+      return postBuild;
+    });
+
+    const afterTraitPostBuildFields = traitPostBuilds.reduce(
+      (fields, traitPostBuild) => {
+        return traitPostBuild(fields);
+      },
+      fieldsToReturn
+    );
     const postBuild = config.postBuild || identity;
     const buildTimeMapFunc = buildTimeConfig.map || identity;
 
-    return buildTimeMapFunc(postBuild(fieldsToReturn));
+    return buildTimeMapFunc(postBuild(afterTraitPostBuildFields));
   };
 };
 
