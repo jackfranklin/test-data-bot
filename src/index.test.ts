@@ -498,4 +498,164 @@ describe('test-data-bot', () => {
       });
     });
   });
+
+  describe('traits', () => {
+    it('allows a trait to be defined and then used', () => {
+      interface User {
+        name: string;
+        admin: boolean;
+      }
+
+      const userBuilder = build<User>({
+        fields: {
+          name: 'jack',
+          admin: perBuild(() => false),
+        },
+        traits: {
+          admin: {
+            overrides: { admin: perBuild(() => true) },
+          },
+        },
+      });
+
+      const userNoTrait = userBuilder();
+      const userWithTrait = userBuilder({ traits: 'admin' });
+      expect(userNoTrait.admin).toEqual(false);
+      expect(userWithTrait.admin).toEqual(true);
+    });
+
+    it('allows a trait to define a postBuild function', () => {
+      interface User {
+        name: string;
+        admin: boolean;
+      }
+
+      const userBuilder = build<User>({
+        fields: {
+          name: 'jack',
+          admin: perBuild(() => false),
+        },
+        traits: {
+          admin: {
+            overrides: { admin: perBuild(() => true) },
+            postBuild: (user) => {
+              user.name = 'postBuildTrait';
+              return user;
+            },
+          },
+        },
+      });
+
+      const userNoTrait = userBuilder();
+      const userWithTrait = userBuilder({ traits: 'admin' });
+      expect(userNoTrait.name).toEqual('jack');
+      expect(userWithTrait.name).toEqual('postBuildTrait');
+    });
+
+    it('applies build time overrides over traits', () => {
+      interface User {
+        name: string;
+        admin: boolean;
+      }
+
+      const userBuilder = build<User>({
+        fields: {
+          name: 'jack',
+          admin: perBuild(() => false),
+        },
+        traits: {
+          admin: {
+            overrides: { admin: perBuild(() => true) },
+          },
+        },
+      });
+
+      const userWithTrait = userBuilder({
+        traits: 'admin',
+        overrides: {
+          admin: perBuild(() => false),
+        },
+      });
+      expect(userWithTrait.admin).toEqual(false);
+    });
+
+    it('supports multiple traits', () => {
+      interface User {
+        name: string;
+        admin: boolean;
+      }
+
+      const userBuilder = build<User>({
+        fields: {
+          name: 'jack',
+          admin: perBuild(() => false),
+        },
+        traits: {
+          admin: {
+            overrides: { admin: perBuild(() => true) },
+          },
+          bob: {
+            overrides: { name: 'bob' },
+          },
+        },
+      });
+
+      const userWithTrait = userBuilder({
+        traits: ['admin', 'bob'],
+      });
+      expect(userWithTrait).toEqual({
+        name: 'bob',
+        admin: true,
+      });
+    });
+
+    it('traits passed later override earlier ones', () => {
+      interface User {
+        name: string;
+      }
+
+      const userBuilder = build<User>({
+        fields: {
+          name: 'jack',
+        },
+        traits: {
+          alice: {
+            overrides: { name: 'alice' },
+          },
+          bob: {
+            overrides: { name: 'bob' },
+          },
+        },
+      });
+
+      const userWithTrait = userBuilder({
+        traits: ['alice', 'bob'],
+      });
+      expect(userWithTrait).toEqual({
+        name: 'bob',
+      });
+    });
+
+    it('logs a warning if you pass a trait that was not defined', () => {
+      interface User {
+        name: string;
+      }
+
+      jest.spyOn(console, 'warn').mockImplementationOnce(() => {});
+
+      const userBuilder = build<User>({
+        fields: {
+          name: 'jack',
+        },
+      });
+      const userWithTrait = userBuilder({
+        traits: 'not-passed',
+      });
+
+      expect(userWithTrait).toEqual({ name: 'jack' });
+      expect(console.warn).toHaveBeenCalledWith(
+        "Warning: trait 'not-passed' not found."
+      );
+    });
+  });
 });

@@ -258,6 +258,64 @@ const user = userBuilder({
 
 Using `overrides` and `map` lets you easily customise a specific object that a builder has created.
 
+## Traits (*new in v1.3*)
+
+Traits let you define a set of overrides for a factory that can easily be re-applied. Let's imagine you've got a users factory where users can be admins:
+
+```js
+interface User {
+  name: string;
+  admin: boolean;
+}
+
+const userBuilder = build<User>({
+  fields: {
+    name: 'jack',
+    admin: perBuild(() => false),
+  },
+  traits: {
+    admin: {
+      overrides: { admin: perBuild(() => true) },
+    },
+  },
+});
+```
+
+Notice that we've defined the `admin` trait here. You don't need to do this; you could easily override the `admin` field each time:
+
+```js
+const adminUser = userBuilder({ overrides: { admin: perBuild(() => true) } });
+```
+
+But imagine that the field changes, or the way you represent admins changes. Or imagine setting an admin is not just one field but a few fields that need to change. Maybe an admin's email address always has to be a certain domain. We can define that behaviour once as a trait:
+
+```js
+const userBuilder = build<User>({
+  fields: {
+    name: 'jack',
+    admin: perBuild(() => false),
+  },
+  traits: {
+    admin: {
+      overrides: { admin: perBuild(() => true) },
+    },
+  },
+});
+```
+
+And now building an admin user is easy:
+
+```js
+const admin = userBuilder({ traits: 'admin' });
+```
+
+You can define and use multiple traits when building an object. Be aware that if two traits override the same value, the one passed in last wins:
+
+```
+// any properties defined in other-trait will override any that admin sets
+const admin = userBuilder({ traits: ['admin', 'other-trait'] });
+```
+
 ## TypeScript support
 
 test-data-bot is written in TypeScript and ships with the types generated so if you're using TypeScript you will get some nice type support out the box.
