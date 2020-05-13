@@ -1,3 +1,8 @@
+### 1.3.0 - 13 May 2020
+
+- Added traits to test-data-bot. See the README for examples.
+
+
 ### 1.2.0 - 09 May 2020
 
 - Factories now do not need a factory name property. You can simply pass in the configuration object :
