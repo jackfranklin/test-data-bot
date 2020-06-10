@@ -32,7 +32,7 @@
     "url": "https://github.com/jackfranklin/test-data-bot.git"
   },
   "devDependencies": {
-    "@types/jest": "^25.2.1",
+    "@types/jest": "^26.0.0",
     "@types/lodash": "^4.14.150",
     "@types/node": "^14.0.1",
     "@typescript-eslint/eslint-plugin": "^2.31.0",
