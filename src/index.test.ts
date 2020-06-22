@@ -122,6 +122,40 @@ describe('test-data-bot', () => {
     });
   });
 
+  it('lets a value be overridden with 0 when building an instance', () => {
+    interface Product {
+      amount: number;
+    }
+
+    const productBuilder = build<Product>('Product', {
+      fields: {
+        amount: 10,
+      },
+    });
+
+    const product = productBuilder({ overrides: { amount: 0 } });
+    expect(product).toEqual({
+      amount: 0,
+    });
+  });
+
+  it('lets a value be overridden with null when building an instance', () => {
+    interface User {
+      name: string | null;
+    }
+
+    const userBuilder = build<User>('User', {
+      fields: {
+        name: 'name',
+      },
+    });
+
+    const user = userBuilder({ overrides: { name: null } });
+    expect(user).toEqual({
+      name: null,
+    });
+  });
+
   describe('perBuild', () => {
     it('generates a new object each time', () => {
       interface User {
