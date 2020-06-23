@@ -84,12 +84,12 @@ const buildTimeTraitsArray = <FactoryResultType>(
   return Array.isArray(traits) ? traits : [traits];
 };
 
-const getValueOrOverride = (
-  overrides: Overrides<any>,
-  traitOverrides: Overrides<any>,
-  fieldValue: any,
+const getValueOrOverride = <FactoryResultType> (
+  overrides: Overrides<FactoryResultType>,
+  traitOverrides: Overrides<FactoryResultType>,
+  fieldValue: Field,
   fieldKey: string
-): any => {
+): Field => {
   if (overrides[fieldKey] !== undefined) {
     return overrides[fieldKey];
   }
