@@ -216,7 +216,7 @@ const user = userBuilder();
 You'll often need to generate a random object but control one of the values directly for the purpose of testing. When you call a builder you can pass in overrides which will override the builder defaults:
 
 ```js
-const { build, fake } = require('@jackfranklin/test-data-bot');
+const { build, fake, sequence } = require('@jackfranklin/test-data-bot');
 
 const userBuilder = build('User', {
   fields: {
@@ -239,7 +239,7 @@ const user = userBuilder({
 If you need to edit the object directly, you can pass in a `map` function when you call the builder:
 
 ```js
-const { build, fake } = require('@jackfranklin/test-data-bot');
+const { build, fake, sequence } = require('@jackfranklin/test-data-bot');
 
 const userBuilder = build('User', {
   fields: {
