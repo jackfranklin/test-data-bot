@@ -262,7 +262,7 @@ Using `overrides` and `map` lets you easily customise a specific object that a b
 
 Traits let you define a set of overrides for a factory that can easily be re-applied. Let's imagine you've got a users factory where users can be admins:
 
-```js
+```ts
 interface User {
   name: string;
   admin: boolean;
@@ -289,7 +289,7 @@ const adminUser = userBuilder({ overrides: { admin: perBuild(() => true) } });
 
 But imagine that the field changes, or the way you represent admins changes. Or imagine setting an admin is not just one field but a few fields that need to change. Maybe an admin's email address always has to be a certain domain. We can define that behaviour once as a trait:
 
-```js
+```ts
 const userBuilder = build<User>({
   fields: {
     name: 'jack',
