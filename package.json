@@ -6,6 +6,10 @@
   "engines": {
     "node": ">=10.13"
   },
+  "publishConfig": {
+    "always-auth": true,
+    "registry": "https://packagecloud.io/meilleursagents/ma-prod/npm/"
+  },
   "main": "build/index.js",
   "scripts": {
     "test": "jest src",
