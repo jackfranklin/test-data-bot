@@ -37,7 +37,7 @@ export type Field =
   | number
   | null
   | FieldGenerator
-  | { [x: string]: Field | Record<string, unknown> }
+  | { [x: string]: Field | any }
   | any[];
 
 export type FieldsConfiguration<FactoryResultType> = {
