@@ -48,7 +48,7 @@ interface Overrides<FactoryResultType> {
   [x: string]: Field;
 }
 
-interface BuildTimeConfig<FactoryResultType> {
+export interface BuildTimeConfig<FactoryResultType> {
   overrides?: Overrides<FactoryResultType>;
   map?: (builtThing: FactoryResultType) => FactoryResultType;
   traits?: string | string[];
