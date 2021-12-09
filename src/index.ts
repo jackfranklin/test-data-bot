@@ -84,9 +84,9 @@ const buildTimeTraitsArray = <FactoryResultType>(
   return Array.isArray(traits) ? traits : [traits];
 };
 
-const getValueOrOverride = <FactoryResultType> (
-  overrides: Overrides<FactoryResultType>,
-  traitOverrides: Overrides<FactoryResultType>,
+const getValueOrOverride = (
+  overrides: Overrides,
+  traitOverrides: Overrides,
   fieldValue: Field,
   fieldKey: string
 ): Field => {
