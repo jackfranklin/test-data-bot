@@ -6,7 +6,6 @@ version: 2.1
 orbs:
   node: circleci/node@4.7.0
 
-
 jobs:
   build:
     parameters:
@@ -18,24 +17,9 @@ jobs:
       - checkout
       - node/install:
           node-version: << parameters.node-version >>
-
-      # Download and cache dependencies
-      # - restore_cache:
-      #    keys:
-      #      - v1-dependencies-{{ checksum "package.json" }}
-      #      # fallback to using the latest cache if no exact match is found
-      #      - v1-dependencies-
-
       - run: npm install
-
-      #- save_cache:
-      #    paths:
-      #      - node_modules
-      #    key: v1-dependencies-{{ checksum "package.json" }}
-
       - run: npm run lint
       - run: npm run test
-
       - run: npm run build
 
 workflows:
