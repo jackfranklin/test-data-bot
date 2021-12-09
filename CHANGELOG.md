@@ -1,3 +1,11 @@
+### 1.4.0 - 09 Dec 2021
+
+_Sorry for the lack of updates and silence! I'm hopeful that I can maintain this library more proactively moving forwards and continue to improve test-data-bot._
+
+- Updated Faker to latest version (v5.5.3)
+- Support non-truthy values in overrides [PR](https://github.com/jackfranklin/test-data-bot/pull/288)
+- Various dependency updates: latest TypeScript, Prettier, ESLint, Jest, and so on.
+
 ### 1.3.0 - 13 May 2020
 
 - Added traits to test-data-bot. See the README for examples.
