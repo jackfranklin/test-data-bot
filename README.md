@@ -161,7 +161,7 @@ const userBuilder = build('User', {
 });
 ```
 
-A user generated from this builder will always the same data. However, if you generate two users using the builder above, they will have _exactly the same object_ for the `details` key:
+A user generated from this builder will always be the same data. However, if you generate two users using the builder above, they will have _exactly the same object_ for the `details` key:
 
 ```js
 const userOne = userBuilder();
