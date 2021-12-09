@@ -161,7 +161,7 @@ const userBuilder = build('User', {
 });
 ```
 
-A user generated from this builder will always the same data. However, if you generate two users using the builder above, they will have _exactly the same object_ for the `details` key:
+A user generated from this builder will always be the same data. However, if you generate two users using the builder above, they will have _exactly the same object_ for the `details` key:
 
 ```js
 const userOne = userBuilder();
@@ -216,7 +216,7 @@ const user = userBuilder();
 You'll often need to generate a random object but control one of the values directly for the purpose of testing. When you call a builder you can pass in overrides which will override the builder defaults:
 
 ```js
-const { build, fake } = require('@jackfranklin/test-data-bot');
+const { build, fake, sequence } = require('@jackfranklin/test-data-bot');
 
 const userBuilder = build('User', {
   fields: {
@@ -239,7 +239,7 @@ const user = userBuilder({
 If you need to edit the object directly, you can pass in a `map` function when you call the builder:
 
 ```js
-const { build, fake } = require('@jackfranklin/test-data-bot');
+const { build, fake, sequence } = require('@jackfranklin/test-data-bot');
 
 const userBuilder = build('User', {
   fields: {
@@ -262,7 +262,7 @@ Using `overrides` and `map` lets you easily customise a specific object that a b
 
 Traits let you define a set of overrides for a factory that can easily be re-applied. Let's imagine you've got a users factory where users can be admins:
 
-```js
+```ts
 interface User {
   name: string;
   admin: boolean;
@@ -289,7 +289,7 @@ const adminUser = userBuilder({ overrides: { admin: perBuild(() => true) } });
 
 But imagine that the field changes, or the way you represent admins changes. Or imagine setting an admin is not just one field but a few fields that need to change. Maybe an admin's email address always has to be a certain domain. We can define that behaviour once as a trait:
 
-```js
+```ts
 const userBuilder = build<User>({
   fields: {
     name: 'jack',
