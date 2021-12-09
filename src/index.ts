@@ -1,38 +1,38 @@
 import * as faker from 'faker';
 import { mapValues } from 'lodash';
 
-type SequenceFunction = (counter: number) => unknown;
+export type SequenceFunction = (counter: number) => unknown;
 
-interface SequenceGenerator {
+export interface SequenceGenerator {
   generatorType: 'sequence';
   userProvidedFunction: SequenceFunction;
   call: (userProvidedFunction: SequenceFunction, counter: number) => unknown;
 }
 
-interface FakerGenerator {
+export interface FakerGenerator {
   generatorType: 'faker';
   call: (fake: Faker.FakerStatic) => any;
 }
 
-interface PerBuildGenerator {
+export interface PerBuildGenerator {
   generatorType: 'perBuild';
   func: () => any;
   call: (f: () => any) => any;
 }
 
-interface OneOfGenerator {
+export interface OneOfGenerator {
   generatorType: 'oneOf';
   options: any[];
   call: <T>(options: T[]) => T;
 }
 
-type FieldGenerator =
+export type FieldGenerator =
   | FakerGenerator
   | SequenceGenerator
   | OneOfGenerator
   | PerBuildGenerator;
 
-type Field =
+export type Field =
   | string
   | number
   | null
@@ -40,28 +40,28 @@ type Field =
   | { [x: string]: Field | {} }
   | any[];
 
-type FieldsConfiguration<FactoryResultType> = {
+export type FieldsConfiguration<FactoryResultType> = {
   readonly [x in keyof FactoryResultType]: Field;
 };
 
-interface Overrides<FactoryResultType> {
+export interface Overrides {
   [x: string]: Field;
 }
 
 export interface BuildTimeConfig<FactoryResultType> {
-  overrides?: Overrides<FactoryResultType>;
+  overrides?: Overrides;
   map?: (builtThing: FactoryResultType) => FactoryResultType;
   traits?: string | string[];
 }
 
-interface TraitsConfiguration<FactoryResultType> {
+export interface TraitsConfiguration<FactoryResultType> {
   readonly [traitName: string]: {
-    overrides?: Overrides<FactoryResultType>;
+    overrides?: Overrides;
     postBuild?: (builtThing: FactoryResultType) => FactoryResultType;
   };
 }
 
-interface BuildConfiguration<FactoryResultType> {
+export interface BuildConfiguration<FactoryResultType> {
   readonly fields: FieldsConfiguration<FactoryResultType>;
   readonly traits?: TraitsConfiguration<FactoryResultType>;
   readonly postBuild?: (x: FactoryResultType) => FactoryResultType;
@@ -73,7 +73,7 @@ const isGenerator = (field: Field): field is FieldGenerator => {
   return (field as FieldGenerator).generatorType !== undefined;
 };
 
-type ValueOf<T> = T[keyof T];
+export type ValueOf<T> = T[keyof T];
 
 const identity = <T>(x: T): T => x;
 
@@ -105,18 +105,19 @@ export const build = <FactoryResultType>(
 
       const traitsArray = buildTimeTraitsArray(buildTimeConfig);
 
-      const traitOverrides: Overrides<FactoryResultType> = traitsArray.reduce<
-        Overrides<FactoryResultType>
-      >((overrides, currentTraitKey) => {
-        const hasTrait = config.traits && config.traits[currentTraitKey];
-        if (!hasTrait) {
-          console.warn(`Warning: trait '${currentTraitKey}' not found.`);
-        }
-        const traitsConfig = config.traits
-          ? config.traits[currentTraitKey]
-          : {};
-        return { ...overrides, ...(traitsConfig.overrides || {}) };
-      }, {});
+      const traitOverrides: Overrides = traitsArray.reduce<Overrides>(
+        (overrides, currentTraitKey) => {
+          const hasTrait = config.traits && config.traits[currentTraitKey];
+          if (!hasTrait) {
+            console.warn(`Warning: trait '${currentTraitKey}' not found.`);
+          }
+          const traitsConfig = config.traits
+            ? config.traits[currentTraitKey]
+            : {};
+          return { ...overrides, ...(traitsConfig.overrides || {}) };
+        },
+        {}
+      );
 
       const valueOrOverride =
         overrides[fieldKey] || traitOverrides[fieldKey] || fieldValue;
@@ -238,7 +239,7 @@ export const perBuild = <T>(func: () => T): PerBuildGenerator => {
   };
 };
 
-type FakerUserArgs = (fake: Faker.FakerStatic) => any;
+export type FakerUserArgs = (fake: Faker.FakerStatic) => any;
 
 export const fake = (userDefinedUsage: FakerUserArgs): FakerGenerator => {
   return {
