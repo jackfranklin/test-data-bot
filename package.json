@@ -32,7 +32,7 @@
     "url": "https://github.com/jackfranklin/test-data-bot.git"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.0",
+    "@types/jest": "^27.0.3",
     "@types/lodash": "^4.14.150",
     "@types/node": "^16.0.0",
     "@typescript-eslint/eslint-plugin": "^5.6.0",
@@ -42,10 +42,10 @@
     "eslint-config-unobtrusive": "^1.2.5",
     "eslint-plugin-jest": "^25.3.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "jest": "^25.5.4",
+    "jest": "^27.4.3",
     "prettier": "^2.5.1",
-    "ts-jest": "^25.5.0",
-    "typescript": "^3.7.5"
+    "ts-jest": "^27.1.1",
+    "typescript": "^4.5.2"
   },
   "dependencies": {
     "@types/faker": "^4.1.9",
