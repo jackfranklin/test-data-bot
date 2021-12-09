@@ -84,6 +84,23 @@ const buildTimeTraitsArray = <FactoryResultType>(
   return Array.isArray(traits) ? traits : [traits];
 };
 
+const getValueOrOverride = <FactoryResultType> (
+  overrides: Overrides<FactoryResultType>,
+  traitOverrides: Overrides<FactoryResultType>,
+  fieldValue: Field,
+  fieldKey: string
+): Field => {
+  if (overrides[fieldKey] !== undefined) {
+    return overrides[fieldKey];
+  }
+
+  if (traitOverrides[fieldKey] !== undefined) {
+    return traitOverrides[fieldKey];
+  }
+
+  return fieldValue;
+};
+
 export const build = <FactoryResultType>(
   factoryNameOrConfig: string | BuildConfiguration<FactoryResultType>,
   configObject?: BuildConfiguration<FactoryResultType>
@@ -119,8 +136,12 @@ export const build = <FactoryResultType>(
         {}
       );
 
-      const valueOrOverride =
-        overrides[fieldKey] || traitOverrides[fieldKey] || fieldValue;
+      const valueOrOverride = getValueOrOverride(
+        overrides,
+        traitOverrides,
+        fieldValue,
+        fieldKey
+      );
 
       /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
       return expandConfigField(valueOrOverride);
