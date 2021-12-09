@@ -125,7 +125,7 @@ describe('test-data-bot', () => {
   describe('perBuild', () => {
     it('generates a new object each time', () => {
       interface User {
-        data: {};
+        data: Record<string, unknown>;
       }
 
       const userBuilder = build<User>('User', {
