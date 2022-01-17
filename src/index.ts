@@ -32,20 +32,14 @@ export type FieldGenerator =
   | OneOfGenerator
   | PerBuildGenerator;
 
-export type Field =
-  | string
-  | number
-  | null
-  | FieldGenerator
-  | { [x: string]: Field | any }
-  | any[];
+export type Field<T = any> = T | FieldGenerator | FieldsConfiguration<T>;
 
 export type FieldsConfiguration<FactoryResultType> = {
-  readonly [Key in keyof FactoryResultType]: FactoryResultType[Key] | Field;
+  readonly [Key in keyof FactoryResultType]: Field<FactoryResultType[Key]>;
 };
 
-export type Overrides<FactoryResultType> = {
-  [Key in keyof FactoryResultType]?: FactoryResultType[Key] | Field;
+export type Overrides<FactoryResultType = any> = {
+  [Key in keyof FactoryResultType]?: Field<FactoryResultType[Key]>;
 };
 
 export interface BuildTimeConfig<FactoryResultType> {
@@ -85,8 +79,8 @@ const buildTimeTraitsArray = <FactoryResultType>(
 };
 
 const getValueOrOverride = (
-  overrides: Overrides<any>,
-  traitOverrides: Overrides<any>,
+  overrides: Overrides,
+  traitOverrides: Overrides,
   fieldValue: Field,
   fieldKey: string
 ): Field => {
@@ -150,9 +144,7 @@ export const build = <FactoryResultType>(
     return finalBuiltThing;
   };
 
-  const expandConfigField = (
-    fieldValue: ValueOf<FieldsConfiguration<FactoryResultType>>
-  ): any => {
+  const expandConfigField = (fieldValue: Field): any => {
     let calculatedValue;
 
     if (isGenerator(fieldValue)) {
@@ -189,10 +181,7 @@ export const build = <FactoryResultType>(
       // as typeof null === 'object'
       calculatedValue = fieldValue;
     } else if (typeof fieldValue === 'object') {
-      const nestedFieldsObject =
-        fieldValue as FieldsConfiguration<FactoryResultType>;
-
-      calculatedValue = expandConfigFields(nestedFieldsObject);
+      calculatedValue = expandConfigFields(fieldValue);
     } else {
       calculatedValue = fieldValue;
     }
