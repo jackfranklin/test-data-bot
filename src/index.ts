@@ -41,11 +41,11 @@ export type Field =
   | any[];
 
 export type FieldsConfiguration<FactoryResultType> = {
-  readonly [x in keyof FactoryResultType]: Field;
+  readonly [Key in keyof FactoryResultType]: FactoryResultType[Key] | Field;
 };
 
 export type Overrides<FactoryResultType> = {
-  [x in keyof FactoryResultType]?: Field;
+  [Key in keyof FactoryResultType]?: FactoryResultType[Key] | Field;
 };
 
 export interface BuildTimeConfig<FactoryResultType> {
