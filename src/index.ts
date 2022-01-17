@@ -45,7 +45,7 @@ export type FieldsConfiguration<FactoryResultType> = {
 };
 
 export type Overrides<FactoryResultType> = {
-  [x in keyof FactoryResultType]: Field;
+  [x in keyof FactoryResultType]?: Field;
 };
 
 export interface BuildTimeConfig<FactoryResultType> {
@@ -91,11 +91,11 @@ const getValueOrOverride = (
   fieldKey: string
 ): Field => {
   if (Object.keys(overrides).includes(fieldKey)) {
-    return overrides[fieldKey];
+    return overrides[fieldKey] as Field;
   }
 
   if (Object.keys(traitOverrides).includes(fieldKey)) {
-    return traitOverrides[fieldKey];
+    return traitOverrides[fieldKey] as Field;
   }
 
   return fieldValue;
@@ -122,18 +122,19 @@ export const build = <FactoryResultType>(
 
       const traitsArray = buildTimeTraitsArray(buildTimeConfig);
 
-      const traitOverrides: Overrides<FactoryResultType> = traitsArray.reduce<
-        Overrides<FactoryResultType>
-      >((overrides, currentTraitKey) => {
-        const hasTrait = config.traits && config.traits[currentTraitKey];
-        if (!hasTrait) {
-          console.warn(`Warning: trait '${currentTraitKey}' not found.`);
-        }
-        const traitsConfig = config.traits
-          ? config.traits[currentTraitKey]
-          : {};
-        return { ...overrides, ...(traitsConfig.overrides || {}) };
-      }, {});
+      const traitOverrides = traitsArray.reduce<Overrides<FactoryResultType>>(
+        (overrides, currentTraitKey) => {
+          const hasTrait = config.traits && config.traits[currentTraitKey];
+          if (!hasTrait) {
+            console.warn(`Warning: trait '${currentTraitKey}' not found.`);
+          }
+          const traitsConfig = config.traits
+            ? config.traits[currentTraitKey]
+            : {};
+          return { ...overrides, ...(traitsConfig.overrides || {}) };
+        },
+        {}
+      );
 
       const valueOrOverride = getValueOrOverride(
         overrides,
