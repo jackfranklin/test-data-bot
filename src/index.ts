@@ -44,19 +44,19 @@ export type FieldsConfiguration<FactoryResultType> = {
   readonly [x in keyof FactoryResultType]: Field;
 };
 
-export interface Overrides {
-  [x: string]: Field;
-}
+export type Overrides<FactoryResultType> = {
+  [x in keyof FactoryResultType]: Field;
+};
 
 export interface BuildTimeConfig<FactoryResultType> {
-  overrides?: Overrides;
+  overrides?: Overrides<FactoryResultType>;
   map?: (builtThing: FactoryResultType) => FactoryResultType;
   traits?: string | string[];
 }
 
 export interface TraitsConfiguration<FactoryResultType> {
   readonly [traitName: string]: {
-    overrides?: Overrides;
+    overrides?: Overrides<FactoryResultType>;
     postBuild?: (builtThing: FactoryResultType) => FactoryResultType;
   };
 }
@@ -85,8 +85,8 @@ const buildTimeTraitsArray = <FactoryResultType>(
 };
 
 const getValueOrOverride = (
-  overrides: Overrides,
-  traitOverrides: Overrides,
+  overrides: Overrides<any>,
+  traitOverrides: Overrides<any>,
   fieldValue: Field,
   fieldKey: string
 ): Field => {
@@ -122,19 +122,18 @@ export const build = <FactoryResultType>(
 
       const traitsArray = buildTimeTraitsArray(buildTimeConfig);
 
-      const traitOverrides: Overrides = traitsArray.reduce<Overrides>(
-        (overrides, currentTraitKey) => {
-          const hasTrait = config.traits && config.traits[currentTraitKey];
-          if (!hasTrait) {
-            console.warn(`Warning: trait '${currentTraitKey}' not found.`);
-          }
-          const traitsConfig = config.traits
-            ? config.traits[currentTraitKey]
-            : {};
-          return { ...overrides, ...(traitsConfig.overrides || {}) };
-        },
-        {}
-      );
+      const traitOverrides: Overrides<FactoryResultType> = traitsArray.reduce<
+        Overrides<FactoryResultType>
+      >((overrides, currentTraitKey) => {
+        const hasTrait = config.traits && config.traits[currentTraitKey];
+        if (!hasTrait) {
+          console.warn(`Warning: trait '${currentTraitKey}' not found.`);
+        }
+        const traitsConfig = config.traits
+          ? config.traits[currentTraitKey]
+          : {};
+        return { ...overrides, ...(traitsConfig.overrides || {}) };
+      }, {});
 
       const valueOrOverride = getValueOrOverride(
         overrides,
