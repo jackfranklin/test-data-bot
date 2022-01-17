@@ -91,11 +91,11 @@ const getValueOrOverride = (
   fieldKey: string
 ): Field => {
   if (Object.keys(overrides).includes(fieldKey)) {
-    return overrides[fieldKey] as Field;
+    return overrides[fieldKey];
   }
 
   if (Object.keys(traitOverrides).includes(fieldKey)) {
-    return traitOverrides[fieldKey] as Field;
+    return traitOverrides[fieldKey];
   }
 
   return fieldValue;
