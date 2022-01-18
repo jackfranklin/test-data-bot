@@ -1,3 +1,7 @@
+### 2.0.0 - Pending
+
+- Removed Faker support. If you wish to use it, you may, and you can use the `perBuild` generator to integrate it. [PR](https://github.com/jackfranklin/test-data-bot/pull/603).
+
 ### 1.4.0 - 09 Dec 2021
 
 _Sorry for the lack of updates and silence! I'm hopeful that I can maintain this library more proactively moving forwards and continue to improve test-data-bot._
