@@ -1,4 +1,3 @@
-import * as faker from 'faker';
 import { mapValues } from 'lodash';
 
 export type SequenceFunction = (counter: number) => unknown;
@@ -7,11 +6,6 @@ export interface SequenceGenerator {
   generatorType: 'sequence';
   userProvidedFunction: SequenceFunction;
   call: (userProvidedFunction: SequenceFunction, counter: number) => unknown;
-}
-
-export interface FakerGenerator {
-  generatorType: 'faker';
-  call: (fake: Faker.FakerStatic) => any;
 }
 
 export interface PerBuildGenerator {
@@ -27,7 +21,6 @@ export interface OneOfGenerator {
 }
 
 export type FieldGenerator =
-  | FakerGenerator
   | SequenceGenerator
   | OneOfGenerator
   | PerBuildGenerator;
@@ -166,11 +159,6 @@ export const build = <FactoryResultType>(
           break;
         }
 
-        case 'faker': {
-          calculatedValue = fieldValue.call(faker);
-          break;
-        }
-
         case 'oneOf': {
           calculatedValue = fieldValue.call(fieldValue.options);
           break;
@@ -255,17 +243,6 @@ export const perBuild = <T>(func: () => T): PerBuildGenerator => {
     func,
     call: (f: () => T): T => {
       return f();
-    },
-  };
-};
-
-export type FakerUserArgs = (fake: Faker.FakerStatic) => any;
-
-export const fake = (userDefinedUsage: FakerUserArgs): FakerGenerator => {
-  return {
-    generatorType: 'faker',
-    call: (faker) => {
-      return userDefinedUsage(faker);
     },
   };
 };

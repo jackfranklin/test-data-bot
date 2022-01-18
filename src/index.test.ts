@@ -1,4 +1,4 @@
-import { build, sequence, fake, oneOf, bool, perBuild } from './index';
+import { build, sequence, oneOf, bool, perBuild } from './index';
 
 describe('test-data-bot', () => {
   it('can build an object with no name', () => {
@@ -85,11 +85,11 @@ describe('test-data-bot', () => {
 
     const addressBuilder = build<Address>('Address', {
       fields: {
-        street1: fake((f) => f.address.streetAddress()),
+        street1: perBuild(() => 'some street'),
         street2: null,
-        city: fake((f) => f.address.city()),
-        state: fake((f) => f.address.state()),
-        zipCode: fake((f) => f.address.zipCode()),
+        city: 'city',
+        state: 'state',
+        zipCode: 'zip',
       },
     });
 
@@ -112,7 +112,7 @@ describe('test-data-bot', () => {
 
     const userBuilder = build<User>('User', {
       fields: {
-        name: fake((f) => f.name.findName()),
+        name: perBuild(() => 'jack'),
       },
     });
 
@@ -235,7 +235,7 @@ describe('test-data-bot', () => {
 
       const userBuilder = build<User>('User', {
         fields: {
-          name: fake((f) => f.name.findName()),
+          name: perBuild(() => 'jack'),
           sports: {
             football: true,
             rugby: false,
@@ -289,7 +289,7 @@ describe('test-data-bot', () => {
           return user;
         },
         fields: {
-          name: fake((f) => f.name.findName()),
+          name: perBuild(() => 'test'),
         },
       });
 
@@ -313,7 +313,7 @@ describe('test-data-bot', () => {
           return user;
         },
         fields: {
-          name: fake((f) => f.name.findName()),
+          name: 'test',
         },
       });
 
@@ -328,23 +328,6 @@ describe('test-data-bot', () => {
         },
       });
       expect(user.name).toEqual('new name');
-    });
-  });
-
-  describe('fake', () => {
-    it('generates some fake data', () => {
-      interface User {
-        name: string;
-      }
-
-      const userBuilder = build<User>('User', {
-        fields: {
-          name: fake((f) => f.name.findName()),
-        },
-      });
-
-      const user = userBuilder();
-      expect(user.name).toEqual(expect.any(String));
     });
   });
 
@@ -391,19 +374,13 @@ describe('test-data-bot', () => {
       const userBuilder = build<User>('User', {
         fields: {
           friends: {
-            names: [
-              fake((f) => f.name.findName()),
-              fake((f) => f.name.findName()),
-            ],
+            names: [perBuild(() => 'test1'), 'test2'],
           },
         },
       });
 
       const user = userBuilder();
-      expect(user.friends.names).toEqual([
-        expect.any(String),
-        expect.any(String),
-      ]);
+      expect(user.friends.names).toEqual(['test1', 'test2']);
     });
 
     it('fully expands super nested awkward things', () => {
@@ -423,7 +400,7 @@ describe('test-data-bot', () => {
 
       const friendBuilder = build<Friend>('Friend', {
         fields: {
-          name: fake((f) => f.name.findName()),
+          name: perBuild(() => 'some name'),
           sports: {
             football: bool(),
             basketball: false,
@@ -479,7 +456,7 @@ describe('test-data-bot', () => {
       const userBuilder = build<User>('User', {
         fields: {
           details: {
-            name: fake((f) => f.name.findName()),
+            name: perBuild(() => 'test name'),
           },
           admin: bool(),
         },
