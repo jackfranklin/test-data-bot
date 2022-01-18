@@ -25,31 +25,25 @@ export type FieldGenerator =
   | OneOfGenerator
   | PerBuildGenerator;
 
-export type Field =
-  | string
-  | number
-  | null
-  | FieldGenerator
-  | { [x: string]: Field | any }
-  | any[];
+export type Field<T = any> = T | FieldGenerator | FieldsConfiguration<T>;
 
 export type FieldsConfiguration<FactoryResultType> = {
-  readonly [x in keyof FactoryResultType]: Field;
+  readonly [Key in keyof FactoryResultType]: Field<FactoryResultType[Key]>;
 };
 
-export interface Overrides {
-  [x: string]: Field;
-}
+export type Overrides<FactoryResultType = any> = {
+  [Key in keyof FactoryResultType]?: Field<FactoryResultType[Key]>;
+};
 
 export interface BuildTimeConfig<FactoryResultType> {
-  overrides?: Overrides;
+  overrides?: Overrides<FactoryResultType>;
   map?: (builtThing: FactoryResultType) => FactoryResultType;
   traits?: string | string[];
 }
 
 export interface TraitsConfiguration<FactoryResultType> {
   readonly [traitName: string]: {
-    overrides?: Overrides;
+    overrides?: Overrides<FactoryResultType>;
     postBuild?: (builtThing: FactoryResultType) => FactoryResultType;
   };
 }
@@ -115,7 +109,7 @@ export const build = <FactoryResultType>(
 
       const traitsArray = buildTimeTraitsArray(buildTimeConfig);
 
-      const traitOverrides: Overrides = traitsArray.reduce<Overrides>(
+      const traitOverrides = traitsArray.reduce<Overrides<FactoryResultType>>(
         (overrides, currentTraitKey) => {
           const hasTrait = config.traits && config.traits[currentTraitKey];
           if (!hasTrait) {
@@ -143,9 +137,7 @@ export const build = <FactoryResultType>(
     return finalBuiltThing;
   };
 
-  const expandConfigField = (
-    fieldValue: ValueOf<FieldsConfiguration<FactoryResultType>>
-  ): any => {
+  const expandConfigField = (fieldValue: Field): any => {
     let calculatedValue;
 
     if (isGenerator(fieldValue)) {
@@ -177,10 +169,7 @@ export const build = <FactoryResultType>(
       // as typeof null === 'object'
       calculatedValue = fieldValue;
     } else if (typeof fieldValue === 'object') {
-      const nestedFieldsObject =
-        fieldValue as FieldsConfiguration<FactoryResultType>;
-
-      calculatedValue = expandConfigFields(nestedFieldsObject);
+      calculatedValue = expandConfigFields(fieldValue);
     } else {
       calculatedValue = fieldValue;
     }

@@ -393,9 +393,7 @@ describe('test-data-bot', () => {
 
       interface User {
         name: string;
-        friends: {
-          names: Friend[];
-        };
+        friends: Friend[];
       }
 
       const friendBuilder = build<Friend>('Friend', {
