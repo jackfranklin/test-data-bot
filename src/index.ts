@@ -1,11 +1,10 @@
 import { mapValues } from 'lodash';
 
-export type SequenceFunction = (counter: number) => unknown;
+export type SequenceFunction<T> = (counter: number) => T;
 
-export interface SequenceGenerator {
+export interface SequenceGenerator<T> {
   generatorType: 'sequence';
-  userProvidedFunction: SequenceFunction;
-  call: (userProvidedFunction: SequenceFunction, counter: number) => unknown;
+  call: (counter: number) => T;
 }
 
 export interface PerBuildGenerator<T> {
@@ -13,15 +12,14 @@ export interface PerBuildGenerator<T> {
   call: () => T;
 }
 
-export interface OneOfGenerator {
+export interface OneOfGenerator<T> {
   generatorType: 'oneOf';
-  options: any[];
-  call: <T>(options: T[]) => T;
+  call: () => T;
 }
 
 export type FieldGenerator<T> =
-  | SequenceGenerator
-  | OneOfGenerator
+  | SequenceGenerator<T>
+  | OneOfGenerator<T>
   | PerBuildGenerator<T>;
 
 export type Field<T = any> = T | FieldGenerator<T> | FieldsConfiguration<T>;
@@ -143,15 +141,12 @@ export const build = <FactoryResultType>(
       switch (fieldValue.generatorType) {
         case 'sequence': {
           ++sequenceCounter;
-          calculatedValue = fieldValue.call(
-            fieldValue.userProvidedFunction,
-            sequenceCounter
-          );
+          calculatedValue = fieldValue.call(sequenceCounter);
           break;
         }
 
         case 'oneOf': {
-          calculatedValue = fieldValue.call(fieldValue.options);
+          calculatedValue = fieldValue.call();
           break;
         }
 
@@ -199,11 +194,10 @@ export const build = <FactoryResultType>(
   };
 };
 
-export const oneOf = <T>(...options: T[]): OneOfGenerator => {
+export const oneOf = <T>(...options: T[]): OneOfGenerator<T> => {
   return {
     generatorType: 'oneOf',
-    options,
-    call: <T>(options: T[]): T => {
+    call: (): T => {
       const randomIndex = Math.floor(Math.random() * options.length);
 
       return options[randomIndex];
@@ -211,23 +205,30 @@ export const oneOf = <T>(...options: T[]): OneOfGenerator => {
   };
 };
 
-export const bool = (): OneOfGenerator => oneOf(true, false);
+export const bool = () => oneOf(true, false);
 
-export const sequence = (
-  userProvidedFunction: SequenceFunction = (x) => x
-): SequenceGenerator => {
+type Sequence = {
+  (): SequenceGenerator<number>;
+  <T>(userProvidedFunction?: SequenceFunction<T>): SequenceGenerator<T>;
+};
+
+export const sequence = ((userProvidedFunction) => {
   return {
     generatorType: 'sequence',
-    userProvidedFunction,
-    call: (userProvidedFunction: SequenceFunction, counter: number) => {
+    call: (counter: number) => {
+      if (typeof userProvidedFunction === 'undefined') {
+        return counter;
+      }
       return userProvidedFunction(counter);
     },
   };
-};
+}) as Sequence;
 
 export const perBuild = <T>(func: () => T): PerBuildGenerator<T> => {
   return {
     generatorType: 'perBuild',
-    call: () => func(),
+    call: () => {
+      return func();
+    },
   };
 };
