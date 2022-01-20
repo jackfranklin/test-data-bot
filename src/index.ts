@@ -8,10 +8,9 @@ export interface SequenceGenerator {
   call: (userProvidedFunction: SequenceFunction, counter: number) => unknown;
 }
 
-export interface PerBuildGenerator {
+export interface PerBuildGenerator<T> {
   generatorType: 'perBuild';
-  func: () => any;
-  call: (f: () => any) => any;
+  call: () => T;
 }
 
 export interface OneOfGenerator {
@@ -20,12 +19,12 @@ export interface OneOfGenerator {
   call: <T>(options: T[]) => T;
 }
 
-export type FieldGenerator =
+export type FieldGenerator<T> =
   | SequenceGenerator
   | OneOfGenerator
-  | PerBuildGenerator;
+  | PerBuildGenerator<T>;
 
-export type Field<T = any> = T | FieldGenerator | FieldsConfiguration<T>;
+export type Field<T = any> = T | FieldGenerator<T> | FieldsConfiguration<T>;
 
 export type FieldsConfiguration<FactoryResultType> = {
   readonly [Key in keyof FactoryResultType]: Field<FactoryResultType[Key]>;
@@ -54,10 +53,10 @@ export interface BuildConfiguration<FactoryResultType> {
   readonly postBuild?: (x: FactoryResultType) => FactoryResultType;
 }
 
-const isGenerator = (field: Field): field is FieldGenerator => {
+const isGenerator = (field: Field): field is FieldGenerator<any> => {
   if (!field) return false;
 
-  return (field as FieldGenerator).generatorType !== undefined;
+  return (field as FieldGenerator<any>).generatorType !== undefined;
 };
 
 export type ValueOf<T> = T[keyof T];
@@ -157,7 +156,7 @@ export const build = <FactoryResultType>(
         }
 
         case 'perBuild': {
-          calculatedValue = fieldValue.call(fieldValue.func);
+          calculatedValue = fieldValue.call();
           break;
         }
       }
@@ -226,12 +225,9 @@ export const sequence = (
   };
 };
 
-export const perBuild = <T>(func: () => T): PerBuildGenerator => {
+export const perBuild = <T>(func: () => T): PerBuildGenerator<T> => {
   return {
     generatorType: 'perBuild',
-    func,
-    call: (f: () => T): T => {
-      return f();
-    },
+    call: () => func(),
   };
 };
