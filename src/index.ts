@@ -209,7 +209,7 @@ export const bool = () => oneOf(true, false);
 
 type Sequence = {
   (): SequenceGenerator<number>;
-  <T>(userProvidedFunction?: SequenceFunction<T>): SequenceGenerator<T>;
+  <T>(userProvidedFunction: SequenceFunction<T>): SequenceGenerator<T>;
 };
 
 export const sequence = ((userProvidedFunction) => {
