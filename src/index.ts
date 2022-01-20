@@ -1,7 +1,5 @@
 import { mapValues } from 'lodash';
 
-export type SequenceFunction<T> = (counter: number) => T;
-
 export interface SequenceGenerator<T> {
   generatorType: 'sequence';
   call: (counter: number) => T;
@@ -209,7 +207,7 @@ export const bool = () => oneOf(true, false);
 
 type Sequence = {
   (): SequenceGenerator<number>;
-  <T>(userProvidedFunction: SequenceFunction<T>): SequenceGenerator<T>;
+  <T>(userProvidedFunction: (count: number) => T): SequenceGenerator<T>;
 };
 
 export const sequence = ((userProvidedFunction) => {
