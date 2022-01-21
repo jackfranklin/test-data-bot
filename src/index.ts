@@ -1,31 +1,26 @@
 import { mapValues } from 'lodash';
 
-export type SequenceFunction = (counter: number) => unknown;
-
-export interface SequenceGenerator {
+export interface SequenceGenerator<T> {
   generatorType: 'sequence';
-  userProvidedFunction: SequenceFunction;
-  call: (userProvidedFunction: SequenceFunction, counter: number) => unknown;
+  call: (counter: number) => T;
 }
 
-export interface PerBuildGenerator {
+export interface PerBuildGenerator<T> {
   generatorType: 'perBuild';
-  func: () => any;
-  call: (f: () => any) => any;
+  call: () => T;
 }
 
-export interface OneOfGenerator {
+export interface OneOfGenerator<T> {
   generatorType: 'oneOf';
-  options: any[];
-  call: <T>(options: T[]) => T;
+  call: () => T;
 }
 
-export type FieldGenerator =
-  | SequenceGenerator
-  | OneOfGenerator
-  | PerBuildGenerator;
+export type FieldGenerator<T> =
+  | SequenceGenerator<T>
+  | OneOfGenerator<T>
+  | PerBuildGenerator<T>;
 
-export type Field<T = any> = T | FieldGenerator | FieldsConfiguration<T>;
+export type Field<T = any> = T | FieldGenerator<T> | FieldsConfiguration<T>;
 
 export type FieldsConfiguration<FactoryResultType> = {
   readonly [Key in keyof FactoryResultType]: Field<FactoryResultType[Key]>;
@@ -54,10 +49,10 @@ export interface BuildConfiguration<FactoryResultType> {
   readonly postBuild?: (x: FactoryResultType) => FactoryResultType;
 }
 
-const isGenerator = (field: Field): field is FieldGenerator => {
+const isGenerator = (field: Field): field is FieldGenerator<any> => {
   if (!field) return false;
 
-  return (field as FieldGenerator).generatorType !== undefined;
+  return (field as FieldGenerator<any>).generatorType !== undefined;
 };
 
 export type ValueOf<T> = T[keyof T];
@@ -144,20 +139,17 @@ export const build = <FactoryResultType>(
       switch (fieldValue.generatorType) {
         case 'sequence': {
           ++sequenceCounter;
-          calculatedValue = fieldValue.call(
-            fieldValue.userProvidedFunction,
-            sequenceCounter
-          );
+          calculatedValue = fieldValue.call(sequenceCounter);
           break;
         }
 
         case 'oneOf': {
-          calculatedValue = fieldValue.call(fieldValue.options);
+          calculatedValue = fieldValue.call();
           break;
         }
 
         case 'perBuild': {
-          calculatedValue = fieldValue.call(fieldValue.func);
+          calculatedValue = fieldValue.call();
           break;
         }
       }
@@ -200,11 +192,10 @@ export const build = <FactoryResultType>(
   };
 };
 
-export const oneOf = <T>(...options: T[]): OneOfGenerator => {
+export const oneOf = <T>(...options: T[]): OneOfGenerator<T> => {
   return {
     generatorType: 'oneOf',
-    options,
-    call: <T>(options: T[]): T => {
+    call: (): T => {
       const randomIndex = Math.floor(Math.random() * options.length);
 
       return options[randomIndex];
@@ -212,26 +203,30 @@ export const oneOf = <T>(...options: T[]): OneOfGenerator => {
   };
 };
 
-export const bool = (): OneOfGenerator => oneOf(true, false);
+export const bool = () => oneOf(true, false);
 
-export const sequence = (
-  userProvidedFunction: SequenceFunction = (x) => x
-): SequenceGenerator => {
+type Sequence = {
+  (): SequenceGenerator<number>;
+  <T>(userProvidedFunction: (count: number) => T): SequenceGenerator<T>;
+};
+
+export const sequence = ((userProvidedFunction) => {
   return {
     generatorType: 'sequence',
-    userProvidedFunction,
-    call: (userProvidedFunction: SequenceFunction, counter: number) => {
+    call: (counter: number) => {
+      if (typeof userProvidedFunction === 'undefined') {
+        return counter;
+      }
       return userProvidedFunction(counter);
     },
   };
-};
+}) as Sequence;
 
-export const perBuild = <T>(func: () => T): PerBuildGenerator => {
+export const perBuild = <T>(func: () => T): PerBuildGenerator<T> => {
   return {
     generatorType: 'perBuild',
-    func,
-    call: (f: () => T): T => {
-      return f();
+    call: () => {
+      return func();
     },
   };
 };
