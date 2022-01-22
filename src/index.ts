@@ -84,15 +84,10 @@ const getValueOrOverride = (
 };
 
 export const build = <FactoryResultType>(
-  factoryNameOrConfig: string | BuildConfiguration<FactoryResultType>,
-  configObject?: BuildConfiguration<FactoryResultType>
+  config: BuildConfiguration<FactoryResultType>
 ): ((
   buildTimeConfig?: BuildTimeConfig<FactoryResultType>
 ) => FactoryResultType) => {
-  const config = (
-    typeof factoryNameOrConfig === 'string' ? configObject : factoryNameOrConfig
-  ) as BuildConfiguration<FactoryResultType>;
-
   let sequenceCounter = 0;
 
   const expandConfigFields = (
