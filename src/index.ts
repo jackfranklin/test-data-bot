@@ -132,41 +132,35 @@ export const build = <FactoryResultType>(
     return finalBuiltThing;
   };
 
-  const expandConfigField = (fieldValue: Field): any => {
-    let calculatedValue;
-
+  const expandConfigField = (fieldValue: Field): Field => {
     if (isGenerator(fieldValue)) {
       switch (fieldValue.generatorType) {
         case 'sequence': {
-          ++sequenceCounter;
-          calculatedValue = fieldValue.call(sequenceCounter);
-          break;
+          return fieldValue.call(++sequenceCounter);
         }
 
-        case 'oneOf': {
-          calculatedValue = fieldValue.call();
-          break;
-        }
-
+        case 'oneOf':
         case 'perBuild': {
-          calculatedValue = fieldValue.call();
-          break;
+          return fieldValue.call();
         }
       }
-    } else if (Array.isArray(fieldValue)) {
-      calculatedValue = fieldValue.map((v) => expandConfigField(v));
-      return calculatedValue;
-    } else if (fieldValue === null || fieldValue === undefined) {
-      // has to be before typeof fieldValue === 'object'
-      // as typeof null === 'object'
-      calculatedValue = fieldValue;
-    } else if (typeof fieldValue === 'object') {
-      calculatedValue = expandConfigFields(fieldValue);
-    } else {
-      calculatedValue = fieldValue;
     }
 
-    return calculatedValue;
+    if (Array.isArray(fieldValue)) {
+      return fieldValue.map((v) => expandConfigField(v));
+    }
+
+    if (fieldValue === null || fieldValue === undefined) {
+      // has to be before typeof fieldValue === 'object'
+      // as typeof null === 'object'
+      return fieldValue;
+    }
+
+    if (typeof fieldValue === 'object') {
+      return expandConfigFields(fieldValue);
+    }
+
+    return fieldValue;
   };
 
   return (buildTimeConfig = {}) => {
