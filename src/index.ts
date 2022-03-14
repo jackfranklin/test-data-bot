@@ -81,14 +81,14 @@ const getValueOrOverride = (
   return fieldValue;
 };
 
-function mapValues<Object, Key extends keyof Object>(
-  object: Object,
-  callback: (value: Object[Key], key: Key) => any
+function mapValues<InputObject, Key extends keyof InputObject>(
+  object: InputObject,
+  callback: (value: InputObject[Key], key: Key) => unknown
 ) {
   return (Object.keys(object) as Key[]).reduce((total, key) => {
     total[key] = callback(object[key], key);
     return total;
-  }, {} as { [key in Key]: any });
+  }, {} as { [key in Key]: unknown });
 }
 
 export const build = <FactoryResultType>(
