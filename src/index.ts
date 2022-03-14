@@ -1,5 +1,3 @@
-import { mapValues } from 'lodash';
-
 export interface SequenceGenerator<T> {
   generatorType: 'sequence';
   call: (counter: number) => T;
@@ -83,6 +81,16 @@ const getValueOrOverride = (
   return fieldValue;
 };
 
+function mapValues<Object, Key extends keyof Object>(
+  object: Object,
+  callback: (value: Object[Key], key: Key) => any
+) {
+  return (Object.keys(object) as Key[]).reduce((total, key) => {
+    total[key] = callback(object[key], key);
+    return total;
+  }, {} as { [key in Key]: any });
+}
+
 export const build = <FactoryResultType>(
   factoryNameOrConfig: string | BuildConfiguration<FactoryResultType>,
   configObject?: BuildConfiguration<FactoryResultType>
@@ -122,7 +130,7 @@ export const build = <FactoryResultType>(
         overrides,
         traitOverrides,
         fieldValue,
-        fieldKey
+        fieldKey as string
       );
 
       /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
