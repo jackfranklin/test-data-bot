@@ -1,6 +1,9 @@
-### 2.0.0 - Pending
+### 2.0.0 - 17 Mar 2022
 
-- Removed Faker support. If you wish to use it, you may, and you can use the `perBuild` generator to integrate it. [PR](https://github.com/jackfranklin/test-data-bot/pull/603).
+- **BREAKING** Removed Faker support. If you wish to use it, you may, and you can use the `perBuild` generator to integrate it. [PR](https://github.com/jackfranklin/test-data-bot/pull/603).
+- **BREAKING** Various TypeScript changes to improve type-safety of builders. May cause values that were previously `any` to be typed more strictly, and hence may need code changes [PR](https://github.com/jackfranklin/test-data-bot/pull/605).
+- **BREAKING** Dropped support for Node 10. Minimum Node version is now 12.
+- Dropped the dependency on Lodash [PR](https://github.com/jackfranklin/test-data-bot/pull/650).
 
 ### 1.4.0 - 09 Dec 2021
 
