@@ -99,6 +99,29 @@ const userTwo = userBuilder();
 // userTwo.email === jack2@gmail.com
 ```
 
+You can use the `reset` method to reset the counter used internally when generating a sequence:
+
+```js
+const { build, sequence } = require('@jackfranklin/test-data-bot');
+
+const userBuilder = build('User', {
+  fields: {
+    id: sequence(),
+  },
+});
+
+const userOne = userBuilder();
+const userTwo = userBuilder();
+userBuilder.reset();
+const userThree = userBuilder();
+const userFour = userBuilder();
+
+// userOne.id === 1
+// userTwo.id === 2
+// userThree.id === 1 <- the sequence has been reset here
+// userFour.id === 2
+```
+
 ### Randomly picking between an option
 
 If you want an object to have a random value, picked from a list you control, you can use `oneOf`:

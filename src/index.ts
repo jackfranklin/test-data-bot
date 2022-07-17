@@ -91,12 +91,15 @@ function mapValues<InputObject, Key extends keyof InputObject>(
   }, {} as { [key in Key]: unknown });
 }
 
+export interface Builder<FactoryResultType> {
+  (buildTimeConfig?: BuildTimeConfig<FactoryResultType>): FactoryResultType;
+  reset(): void;
+}
+
 export const build = <FactoryResultType>(
   factoryNameOrConfig: string | BuildConfiguration<FactoryResultType>,
   configObject?: BuildConfiguration<FactoryResultType>
-): ((
-  buildTimeConfig?: BuildTimeConfig<FactoryResultType>
-) => FactoryResultType) => {
+): Builder<FactoryResultType> => {
   const config = (
     typeof factoryNameOrConfig === 'string' ? configObject : factoryNameOrConfig
   ) as BuildConfiguration<FactoryResultType>;
@@ -171,7 +174,9 @@ export const build = <FactoryResultType>(
     return fieldValue;
   };
 
-  return (buildTimeConfig = {}) => {
+  const builder = (
+    buildTimeConfig: BuildTimeConfig<FactoryResultType> = {}
+  ) => {
     const fieldsToReturn = expandConfigFields(config.fields, buildTimeConfig);
 
     const traitsArray = buildTimeTraitsArray(buildTimeConfig);
@@ -192,6 +197,10 @@ export const build = <FactoryResultType>(
 
     return buildTimeMapFunc(postBuild(afterTraitPostBuildFields));
   };
+  builder.reset = () => {
+    sequenceCounter = 0;
+  };
+  return builder;
 };
 
 export const oneOf = <T>(...options: T[]): OneOfGenerator<T> => {
