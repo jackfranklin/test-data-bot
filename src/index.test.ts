@@ -221,6 +221,44 @@ describe('test-data-bot', () => {
       const users = [userBuilder(), userBuilder()];
       expect(users).toEqual([{ id: 10 }, { id: 20 }]);
     });
+    it('can have the sequence be manually reset', () => {
+      interface User {
+        id: number;
+      }
+
+      const userBuilder = build<User>('User', {
+        fields: {
+          id: sequence((x) => x ** 2),
+        },
+      });
+
+      const usersGroup1 = [userBuilder(), userBuilder(), userBuilder()];
+      expect(usersGroup1).toEqual([{ id: 1 }, { id: 4 }, { id: 9 }]);
+
+      userBuilder.reset();
+
+      const usersGroup2 = [userBuilder(), userBuilder(), userBuilder()];
+      expect(usersGroup2).toEqual([{ id: 1 }, { id: 4 }, { id: 9 }]);
+    });
+    it('can have a simple sequence be manually reset', () => {
+      interface User {
+        id: number;
+      }
+
+      const userBuilder = build<User>('User', {
+        fields: {
+          id: sequence(),
+        },
+      });
+
+      const usersGroup1 = [userBuilder(), userBuilder(), userBuilder()];
+      expect(usersGroup1).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }]);
+
+      userBuilder.reset();
+
+      const usersGroup2 = [userBuilder(), userBuilder(), userBuilder()];
+      expect(usersGroup2).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }]);
+    });
   });
 
   describe('mapping', () => {
