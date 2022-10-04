@@ -1,6 +1,12 @@
 import { build, sequence, oneOf, bool, perBuild } from './index';
+import { assert } from 'chai';
+import sinon from 'sinon';
 
 describe('test-data-bot', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
   it('can build an object with no name', () => {
     interface User {
       name: string;
@@ -13,9 +19,7 @@ describe('test-data-bot', () => {
     });
 
     const user = userBuilder();
-    expect(user).toEqual({
-      name: 'jack',
-    });
+    assert.deepEqual(user, { name: 'jack' });
   });
 
   it('can build an object with primitive values only', () => {
@@ -30,9 +34,7 @@ describe('test-data-bot', () => {
     });
 
     const user = userBuilder();
-    expect(user).toEqual({
-      name: 'jack',
-    });
+    assert.deepEqual(user, { name: 'jack' });
   });
 
   it('lets you pass null in as a value', () => {
@@ -47,9 +49,7 @@ describe('test-data-bot', () => {
     });
 
     const user = userBuilder();
-    expect(user).toEqual({
-      name: null,
-    });
+    assert.deepEqual(user, { name: null });
   });
 
   it('lets you pass undefined in as a value', () => {
@@ -64,9 +64,7 @@ describe('test-data-bot', () => {
     });
 
     const user = userBuilder();
-    expect(user).toEqual({
-      name: undefined,
-    });
+    assert.deepEqual(user, { name: undefined });
   });
 
   it('supports nulls in nested builders', () => {
@@ -102,7 +100,7 @@ describe('test-data-bot', () => {
     });
 
     const company = companyBuilder();
-    expect(company.mailingAddress.street2).toEqual(null);
+    assert.isNull(company.mailingAddress.street2);
   });
 
   it('lets a value be overriden when building an instance', () => {
@@ -117,7 +115,7 @@ describe('test-data-bot', () => {
     });
 
     const user = userBuilder({ overrides: { name: 'customName' } });
-    expect(user).toEqual({
+    assert.deepEqual(user, {
       name: 'customName',
     });
   });
@@ -134,7 +132,7 @@ describe('test-data-bot', () => {
     });
 
     const product = productBuilder({ overrides: { amount: 0 } });
-    expect(product).toEqual({
+    assert.deepEqual(product, {
       amount: 0,
     });
   });
@@ -151,7 +149,7 @@ describe('test-data-bot', () => {
     });
 
     const user = userBuilder({ overrides: { name: null } });
-    expect(user).toEqual({
+    assert.deepEqual(user, {
       name: null,
     });
   });
@@ -171,9 +169,9 @@ describe('test-data-bot', () => {
       const user1 = userBuilder();
       const user2 = userBuilder();
 
-      expect(user1.data).toEqual({});
-      expect(user2.data).toEqual({});
-      expect(user1.data).not.toBe(user2.data);
+      assert.deepEqual(user1.data, {});
+      assert.deepEqual(user2.data, {});
+      assert.notStrictEqual(user1.data, user2.data);
     });
   });
 
@@ -190,7 +188,7 @@ describe('test-data-bot', () => {
       });
 
       const users = [userBuilder(), userBuilder()];
-      expect(users).toEqual([{ id: 1 }, { id: 2 }]);
+      assert.deepEqual(users, [{ id: 1 }, { id: 2 }]);
     });
 
     it('can take a function that returns a string', () => {
@@ -205,8 +203,9 @@ describe('test-data-bot', () => {
       });
 
       const user = userBuilder();
-      expect(user).toEqual({ id: 'jack1@gmail.com' });
+      assert.deepEqual(user, { id: 'jack1@gmail.com' });
     });
+
     it('can take a function to return a number', () => {
       interface User {
         id: number;
@@ -219,7 +218,7 @@ describe('test-data-bot', () => {
       });
 
       const users = [userBuilder(), userBuilder()];
-      expect(users).toEqual([{ id: 10 }, { id: 20 }]);
+      assert.deepEqual(users, [{ id: 10 }, { id: 20 }]);
     });
     it('can have the sequence be manually reset', () => {
       interface User {
@@ -233,13 +232,14 @@ describe('test-data-bot', () => {
       });
 
       const usersGroup1 = [userBuilder(), userBuilder(), userBuilder()];
-      expect(usersGroup1).toEqual([{ id: 1 }, { id: 4 }, { id: 9 }]);
+      assert.deepEqual(usersGroup1, [{ id: 1 }, { id: 4 }, { id: 9 }]);
 
       userBuilder.reset();
 
       const usersGroup2 = [userBuilder(), userBuilder(), userBuilder()];
-      expect(usersGroup2).toEqual([{ id: 1 }, { id: 4 }, { id: 9 }]);
+      assert.deepEqual(usersGroup2, [{ id: 1 }, { id: 4 }, { id: 9 }]);
     });
+
     it('can have a simple sequence be manually reset', () => {
       interface User {
         id: number;
@@ -252,12 +252,12 @@ describe('test-data-bot', () => {
       });
 
       const usersGroup1 = [userBuilder(), userBuilder(), userBuilder()];
-      expect(usersGroup1).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }]);
+      assert.deepEqual(usersGroup1, [{ id: 1 }, { id: 2 }, { id: 3 }]);
 
       userBuilder.reset();
 
       const usersGroup2 = [userBuilder(), userBuilder(), userBuilder()];
-      expect(usersGroup2).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }]);
+      assert.deepEqual(usersGroup2, [{ id: 1 }, { id: 2 }, { id: 3 }]);
     });
   });
 
@@ -290,8 +290,8 @@ describe('test-data-bot', () => {
           return user;
         },
       });
-      expect(user.name).toEqual('customName');
-      expect(user.sports).toEqual({
+      assert.strictEqual(user.name, 'customName');
+      assert.deepEqual(user.sports, {
         football: true,
         rugby: true,
       });
@@ -313,7 +313,7 @@ describe('test-data-bot', () => {
       });
 
       const user = userBuilder();
-      expect(user.name).toEqual('JACK');
+      assert.strictEqual(user.name, 'JACK');
     });
 
     it('runs the postBuild function after applying overrides', () => {
@@ -336,11 +336,10 @@ describe('test-data-bot', () => {
           name: 'jack',
         },
       });
-      expect(user.name).toEqual('JACK');
+      assert.strictEqual(user.name, 'JACK');
     });
 
     it('the build time map function runs after postBuild', () => {
-      expect.assertions(2);
       interface User {
         name: string;
       }
@@ -360,17 +359,17 @@ describe('test-data-bot', () => {
           name: 'jack',
         },
         map: (user) => {
-          expect(user.name).toEqual('JACK');
+          assert.strictEqual(user.name, 'JACK');
           user.name = 'new name';
           return user;
         },
       });
-      expect(user.name).toEqual('new name');
+      assert.strictEqual(user.name, 'new name');
     });
   });
 
   describe('oneOf', () => {
-    test('bool is provided as a shortcut for oneOf(true, false)', () => {
+    it('bool is provided as a shortcut for oneOf(true, false)', () => {
       interface User {
         admin: boolean;
       }
@@ -382,7 +381,7 @@ describe('test-data-bot', () => {
       });
 
       const user = userBuilder();
-      expect(user.admin === true || user.admin === false).toEqual(true);
+      assert.typeOf(user.admin, 'boolean');
     });
 
     it('picks a random entry from the given selection', () => {
@@ -397,7 +396,7 @@ describe('test-data-bot', () => {
       });
 
       const user = userBuilder();
-      expect(['a', 'b', 'c'].includes(user.name)).toEqual(true);
+      assert.includeMembers(['a', 'b', 'c'], [user.name]);
     });
   });
 
@@ -418,7 +417,7 @@ describe('test-data-bot', () => {
       });
 
       const user = userBuilder();
-      expect(user.friends.names).toEqual(['test1', 'test2']);
+      assert.deepEqual(user.friends.names, ['test1', 'test2']);
     });
 
     it('fully expands super nested awkward things', () => {
@@ -462,18 +461,18 @@ describe('test-data-bot', () => {
       });
 
       const user = userBuilder();
-      expect(user.name).toEqual('jack');
-      expect(user.friends).toEqual([
+      assert.strictEqual(user.name, 'jack');
+      assert.deepEqual(user.friends, [
         {
           name: 'customName',
           sports: {
-            football: expect.any(Boolean),
+            football: user.friends[0].sports.football,
             basketball: false,
             rugby: true,
           },
         },
         {
-          name: expect.any(String),
+          name: user.friends[1].name,
           sports: {
             rugby: false,
           },
@@ -499,16 +498,12 @@ describe('test-data-bot', () => {
       });
 
       const user = userBuilder();
-      expect(user).toEqual({
-        details: {
-          name: expect.any(String),
-        },
-        admin: expect.any(Boolean),
-      });
+
+      assert.typeOf(user.details.name, 'string');
+      assert.typeOf(user.admin, 'boolean');
     });
 
     it('does not call postBuild on nested objects', () => {
-      expect.assertions(1);
       interface User {
         name: string;
         sports: {
@@ -535,7 +530,7 @@ describe('test-data-bot', () => {
 
       const user = userBuilder();
 
-      expect(user).toEqual({
+      assert.deepEqual(user, {
         name: 'new name',
         sports: {
           football: true,
@@ -567,8 +562,8 @@ describe('test-data-bot', () => {
 
       const userNoTrait = userBuilder();
       const userWithTrait = userBuilder({ traits: 'admin' });
-      expect(userNoTrait.admin).toEqual(false);
-      expect(userWithTrait.admin).toEqual(true);
+      assert.strictEqual(userNoTrait.admin, false);
+      assert.strictEqual(userWithTrait.admin, true);
     });
 
     it('allows a trait to define a postBuild function', () => {
@@ -595,8 +590,8 @@ describe('test-data-bot', () => {
 
       const userNoTrait = userBuilder();
       const userWithTrait = userBuilder({ traits: 'admin' });
-      expect(userNoTrait.name).toEqual('jack');
-      expect(userWithTrait.name).toEqual('postBuildTrait');
+      assert.strictEqual(userNoTrait.name, 'jack');
+      assert.strictEqual(userWithTrait.name, 'postBuildTrait');
     });
 
     it('applies build time overrides over traits', () => {
@@ -623,7 +618,7 @@ describe('test-data-bot', () => {
           admin: perBuild(() => false),
         },
       });
-      expect(userWithTrait.admin).toEqual(false);
+      assert.isFalse(userWithTrait.admin);
     });
 
     it('supports multiple traits', () => {
@@ -650,7 +645,7 @@ describe('test-data-bot', () => {
       const userWithTrait = userBuilder({
         traits: ['admin', 'bob'],
       });
-      expect(userWithTrait).toEqual({
+      assert.deepEqual(userWithTrait, {
         name: 'bob',
         admin: true,
       });
@@ -678,7 +673,7 @@ describe('test-data-bot', () => {
       const userWithTrait = userBuilder({
         traits: ['alice', 'bob'],
       });
-      expect(userWithTrait).toEqual({
+      assert.deepEqual(userWithTrait, {
         name: 'bob',
       });
     });
@@ -688,7 +683,7 @@ describe('test-data-bot', () => {
         name: string;
       }
 
-      jest.spyOn(console, 'warn').mockImplementationOnce(() => {});
+      const consoleStub = sinon.stub(console, 'warn').callsFake(() => {});
 
       const userBuilder = build<User>({
         fields: {
@@ -699,9 +694,11 @@ describe('test-data-bot', () => {
         traits: 'not-passed',
       });
 
-      expect(userWithTrait).toEqual({ name: 'jack' });
-      expect(console.warn).toHaveBeenCalledWith(
-        "Warning: trait 'not-passed' not found."
+      assert.deepEqual(userWithTrait, { name: 'jack' });
+      assert.isTrue(
+        consoleStub.calledOnceWithExactly(
+          "Warning: trait 'not-passed' not found."
+        )
       );
     });
   });
