@@ -81,7 +81,7 @@ const getValueOrOverride = (
   return fieldValue;
 };
 
-function mapValues<InputObject, Key extends keyof InputObject>(
+function mapValues<InputObject extends object, Key extends keyof InputObject>(
   object: InputObject,
   callback: (value: InputObject[Key], key: Key) => unknown
 ) {
