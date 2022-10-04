@@ -2,10 +2,9 @@ module.exports = {
   env: {
     es6: true,
     node: true,
-    jest: true,
   },
   parser: '@typescript-eslint/parser',
-  plugins: ['prettier', 'jest', '@typescript-eslint'],
+  plugins: ['prettier', 'mocha', '@typescript-eslint'],
   extends: ['prettier', 'plugin:@typescript-eslint/recommended'],
   rules: {
     'prettier/prettier': ['error'],
@@ -13,11 +12,7 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-empty-function': 'off',
 
-    // rules from eslint-plugin-jest
-    'jest/no-disabled-tests': 'error',
-    'jest/no-focused-tests': 'error',
-    'jest/no-identical-title': 'error',
-    'jest/no-test-prefixes': 'error',
-    'jest/valid-expect': 'error',
+    'mocha/no-skipped-tests': 'error',
+    'mocha/no-exclusive-tests': 'error',
   },
 };

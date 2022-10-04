@@ -8,7 +8,7 @@
   },
   "main": "build/index.js",
   "scripts": {
-    "test": "jest src",
+    "test": "mocha",
     "lint": "eslint 'src/*.ts' && prettier --list-different 'src/*.ts'",
     "lint-fix": "eslint --fix 'src/*.ts' && prettier --write 'src/*.ts'",
     "build": "tsc --build tsconfig.json",
@@ -32,18 +32,22 @@
     "url": "https://github.com/jackfranklin/test-data-bot.git"
   },
   "devDependencies": {
-    "@types/jest": "^27.0.3",
+    "@types/chai": "^4.3.3",
+    "@types/mocha": "^10.0.0",
     "@types/node": "^18.0.0",
+    "@types/sinon": "^10.0.13",
     "@typescript-eslint/eslint-plugin": "^5.6.0",
     "@typescript-eslint/parser": "^5.6.0",
+    "chai": "^4.3.6",
     "eslint": "^8.4.1",
     "eslint-config-prettier": "^8.0.0",
     "eslint-config-unobtrusive": "^1.2.5",
-    "eslint-plugin-jest": "^26.6.0",
+    "eslint-plugin-mocha": "^10.1.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "jest": "^27.4.3",
+    "mocha": "^10.0.0",
     "prettier": "^2.5.1",
-    "ts-jest": "^27.1.1",
+    "sinon": "^14.0.1",
+    "ts-node": "^10.9.1",
     "typescript": "^4.8.4"
   }
 }
