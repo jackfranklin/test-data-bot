@@ -1,6 +1,6 @@
-name: Node.js CI
+name: test-data-bot tests
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
