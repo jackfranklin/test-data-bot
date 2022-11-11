@@ -723,3 +723,27 @@ tap.test('logs a warning if you pass a trait that was not defined', (t) => {
   );
   t.end();
 });
+
+tap.test('dates can be created and overwritten correctly', (t) => {
+  interface Plan {
+    createdAt: Date;
+  }
+
+  const planBuilder = build<Plan>('Plan', {
+    fields: {
+      createdAt: perBuild(() => new Date()),
+    },
+  });
+
+  const plan = planBuilder();
+  t.type(plan.createdAt, 'Date');
+
+  const planWithCustomDate = planBuilder({
+    overrides: {
+      createdAt: new Date(),
+    },
+  });
+  t.type(planWithCustomDate.createdAt, 'Date');
+
+  t.end();
+});

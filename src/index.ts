@@ -167,6 +167,10 @@ export const build = <FactoryResultType>(
       return fieldValue;
     }
 
+    if (fieldValue instanceof Date) {
+      return fieldValue;
+    }
+
     if (typeof fieldValue === 'object') {
       return expandConfigFields(fieldValue);
     }
