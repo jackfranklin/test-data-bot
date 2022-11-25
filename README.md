@@ -1,7 +1,5 @@
 # @jackfranklin/test-data-bot
 
-[![CircleCI](https://circleci.com/gh/jackfranklin/test-data-bot.svg?style=svg)](https://circleci.com/gh/jackfranklin/test-data-bot)
-
 [![npm version](https://badge.fury.io/js/%40jackfranklin%2Ftest-data-bot.svg)](https://badge.fury.io/js/%40jackfranklin%2Ftest-data-bot)
 
 **IMPORTANT**: `@jackfranklin/test-data-bot` is the new version of this package, written in TypeScript and initially released as version 1.0.0.
@@ -32,7 +30,7 @@ We use the `build` function to create a builder. You give a builder an object of
 ```js
 const { build } = require('@jackfranklin/test-data-bot');
 
-const userBuilder = build('User', {
+const userBuilder = build({
   fields: {
     name: 'jack',
   },
@@ -45,18 +43,6 @@ console.log(user);
 
 _While the examples in this README use `require`, you can also use `import {build} from '@jackfranklin/test-data-bot'`._
 
-**Note**: if you're using *Version 1.2 or higher* you can leave the name of the factory and pass in only the configuration object:
-
-```js
-const userBuilder = build({
-  fields: {
-    name: 'jack',
-  },
-});
-```
-
-Feel free to use the name property if you like, but it's not used for anything in test-data-bot. It will probably get removed in a future major version.
-
 Once you've created a builder, you can call it to generate an instance of that object - in this case, a `user`.
 
 It would be boring though if each user had the same `name` - so test-data-bot lets you generate data via some API methods:
@@ -68,7 +54,7 @@ Often you will be creating objects that have an ID that comes from a database, s
 ```js
 const { build, sequence } = require('@jackfranklin/test-data-bot');
 
-const userBuilder = build('User', {
+const userBuilder = build({
   fields: {
     id: sequence(),
   },
@@ -86,7 +72,7 @@ If you need more control, you can pass `sequence` a function that will be called
 ```js
 const { build, sequence } = require('@jackfranklin/test-data-bot');
 
-const userBuilder = build('User', {
+const userBuilder = build({
   fields: {
     email: sequence(x => `jack${x}@gmail.com`),
   },
@@ -104,7 +90,7 @@ You can use the `reset` method to reset the counter used internally when generat
 ```js
 const { build, sequence } = require('@jackfranklin/test-data-bot');
 
-const userBuilder = build('User', {
+const userBuilder = build({
   fields: {
     id: sequence(),
   },
@@ -129,7 +115,7 @@ If you want an object to have a random value, picked from a list you control, yo
 ```js
 const { build, oneOf } = require('@jackfranklin/test-data-bot');
 
-const userBuilder = build('User', {
+const userBuilder = build({
   fields: {
     name: oneOf('alice', 'bob', 'charlie'),
   },
@@ -143,7 +129,7 @@ If you need something to be either `true` or `false`, you can use `bool`:
 ```js
 const { build, bool } = require('@jackfranklin/test-data-bot');
 
-const userBuilder = build('User', {
+const userBuilder = build({
   fields: {
     isAdmin: bool(),
   },
@@ -157,7 +143,7 @@ test-data-bot lets you declare a field to always be a particular value:
 ```js
 const { build, perBuild } = require('@jackfranklin/test-data-bot');
 
-const userBuilder = build('User', {
+const userBuilder = build({
   fields: {
     name: 'jack',
     details: {},
@@ -179,7 +165,7 @@ If you want to generate a unique object every time, you can use `perBuild` which
 ```js
 const { build, perBuild } = require('@jackfranklin/test-data-bot');
 
-const userBuilder = build('User', {
+const userBuilder = build({
   fields: {
     name: 'jack',
     details: perBuild(() => {
@@ -200,7 +186,7 @@ This approach also lets you use any additional libraries, say if you wanted to u
 const myFakeLibrary = require('whatever-library-you-want');
 const { build, perBuild } = require('@jackfranklin/test-data-bot');
 
-const userBuilder = build('User', {
+const userBuilder = build({
   fields: {
     name: perBuild(() => myFakeLibrary.randomName()),
   },
@@ -209,12 +195,12 @@ const userBuilder = build('User', {
 
 ### Mapping over all the created objects with `postBuild`
 
-If you need to transform an object in a way that test-data-bot doesn't support out the box, you can pass a `postBuild` function when creating a builder. This builder will run everytime you create an object from it.
+If you need to transform an object in a way that test-data-bot doesn't support out the box, you can pass a `postBuild` function when creating a builder. This builder will run every time you create an object from it.
 
 ```js
 const { build, fake } = require('@jackfranklin/test-data-bot');
 
-const userBuilder = build('User', {
+const userBuilder = build({
   fields: {
     name: fake(f => f.name.findName()),
   },
@@ -235,7 +221,7 @@ You'll often need to generate a random object but control one of the values dire
 ```js
 const { build, fake, sequence } = require('@jackfranklin/test-data-bot');
 
-const userBuilder = build('User', {
+const userBuilder = build({
   fields: {
     id: sequence(),
     name: fake(f => f.name.findName()),
@@ -253,15 +239,15 @@ const user = userBuilder({
 // user.name === 'jack'
 ```
 
-If you need to edit the object directly, you can pass in a `map` function when you call the builder:
+If you need to edit the object directly, you can pass in a `map` function when you call the builder. This will be called after test-data-bot has generated the fake object, and lets you directly change its properties.
 
 ```js
-const { build, fake, sequence } = require('@jackfranklin/test-data-bot');
+const { build, sequence } = require('@jackfranklin/test-data-bot');
 
 const userBuilder = build('User', {
   fields: {
     id: sequence(),
-    name: fake(f => f.name.findName()),
+    name: 'jack',
   },
 });
 
@@ -288,11 +274,11 @@ interface User {
 const userBuilder = build<User>({
   fields: {
     name: 'jack',
-    admin: perBuild(() => false),
+    admin: false,
   },
   traits: {
     admin: {
-      overrides: { admin: perBuild(() => true) },
+      overrides: { admin: true },
     },
   },
 });
@@ -301,7 +287,7 @@ const userBuilder = build<User>({
 Notice that we've defined the `admin` trait here. You don't need to do this; you could easily override the `admin` field each time:
 
 ```js
-const adminUser = userBuilder({ overrides: { admin: perBuild(() => true) } });
+const adminUser = userBuilder({ overrides: { admin: true } });
 ```
 
 But imagine that the field changes, or the way you represent admins changes. Or imagine setting an admin is not just one field but a few fields that need to change. Maybe an admin's email address always has to be a certain domain. We can define that behaviour once as a trait:
@@ -310,11 +296,11 @@ But imagine that the field changes, or the way you represent admins changes. Or 
 const userBuilder = build<User>({
   fields: {
     name: 'jack',
-    admin: perBuild(() => false),
+    admin: false,
   },
   traits: {
     admin: {
-      overrides: { admin: perBuild(() => true) },
+      overrides: { admin: true },
     },
   },
 });
@@ -348,7 +334,7 @@ interface User {
 const userBuilder = build<User>('User', {
   fields: {
     id: sequence(),
-    name: fake(f => f.name.findName()),
+    name: perBuild(() => yourCustomFakerLibary().name)
   },
 });
 
@@ -357,126 +343,3 @@ const users = userBuilder();
 
 You should get TypeScript errors if the builder doesn't satisfy the interface you've given it.
 
-_I'm still quite new to TypeScript so please let me know if you don't get the errors/type hints that you expect!_
-
-# Migrating from `test-data-bot@0.8.0` to `@jackfranklin/test-data-bot@1.0.0`
-
-Firstly: there is no need to migrate immediately if the old version is doing the job for you - but it won't be improved or have bug fixes so it's recommended to migrate slowly to 1.0.0.
-
-You can also run both versions at the same time - they won't conflict. Just make sure you rename the API methods or import everything:
-
-```js
-const legacyTestDataBot = require('test-data-bot')
-const newTestDataBot = require('@jackfranklin/test-data-bot')
-
-const oldBuilder = legacyTestDataBot.build(...)
-
-const newBuilder = newTestDataBot.build(...)
-```
-
-## Breaking changes in the new version
-
-### Node 10.13 is required
-
-Previously Node 8 was supported, but now the minimum is 10.13.
-
-### API for declaring fields has changed
-
-Before:
-
-```js
-const userBuilder = build('User').fields({
-  name: fake(f => f.name.findName()),
-});
-```
-
-After:
-
-```js
-const userBuilder = build('User', {
-  fields: {
-    name: fake(f => f.name.findName()),
-  },
-});
-```
-
-### `numberBetween` has been removed
-
-`numberBetween` was a shortcut around `fake`. If you need it back you can easily define it:
-
-```js
-const { fake } = require('@jackfranklin/test-data-bot');
-const numberBetween = (min, max) => fake(f => f.random.number({ min, max }));
-```
-
-It's highly recommended to maintain a library of custom matchers that are useful for your application.
-
-### `incrementingId` has been removed
-
-You can now call `sequence()` with no argument to get the same result:
-
-Before:
-
-```js
-id: incrementingId();
-```
-
-After:
-
-```js
-id: sequence();
-```
-
-### `arrayOf` has been removed
-
-It was hard to provide a nice API for `arrayOf` that supported all cases. It's now recommended to use the `postBuild` function if you always want an object to have an array of things:
-
-```js
-const blogPostBuilder = build('BlogPost', {...})
-
-const userBuilder = build('User', {
-  fields: {
-    name: fake(f => f.name.findName()),
-    blogPosts: [],
-  },
-  postBuild: user => {
-    user.blogPosts = Array(3).fill(undefined).map(_ => blogPostBuilder())
-    return user
-  }
-});
-```
-
-### The `map` function has been removed
-
-The old version of test-data-bot provided a map function on each object that it generated. This was confusing and awkward as it meant test-data-bot placed a `map` function on generated objects. If your object had a `map` property, it would be overriden!
-
-This is now replaced by the `postBuild` function.
-
-Before:
-
-```js
-const userBuilder = build('User')
-  .fields({
-    name: fake(f => f.name.findName()),
-    email: sequence(x => `jack${x}@test.com`),
-  })
-  .map(user => ({
-    name: user.name.toUpperCase(),
-    email: user.email.toUpperCase(),
-  }));
-```
-
-After:
-
-```js
-const userBuilder = build('User', {
-  fields: {
-    name: fake(f => f.name.findName()),
-    email: sequence(x => `jack${x}@test.com`),
-  },
-  postBuild: user => ({
-    name: user.name.toUpperCase(),
-    email: user.email.toUpperCase(),
-  }),
-});
-```
