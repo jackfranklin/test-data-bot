@@ -343,3 +343,18 @@ const users = userBuilder();
 
 You should get TypeScript errors if the builder doesn't satisfy the interface you've given it.
 
+## What happened to Faker / the `fake` generator?
+
+Prior to v2.0.0 of this library, we shipped built-in support for using Faker.js to generate data. It was removed because it was a big dependency to ship to all users, even those who don't use faker. If you want to use it you can, in combination with the `perBuild` builder:
+
+```js
+import {build, perBuild} from '@jackfranklin/test-data-bot';
+
+// This can be any fake data library you like.
+import fake from 'faker';
+
+const userBuilder = build({
+  // Within perBuild, call your faker library directly.
+  name: perBuild(() => fake().name())
+})
+```
