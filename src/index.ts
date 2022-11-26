@@ -182,8 +182,26 @@ export const build = <FactoryResultType>(
     buildTimeConfig: BuildTimeConfig<FactoryResultType> = {}
   ) => {
     const fieldsToReturn = expandConfigFields(config.fields, buildTimeConfig);
-
     const traitsArray = buildTimeTraitsArray(buildTimeConfig);
+
+    // A user might define a value in a trait that doesn't exist in the base
+    // set of fields. So we need to check now if the traits set any values that
+    // aren't in the base, and set them too.
+    traitsArray.forEach((traitName) => {
+      const traitConfig = (config.traits && config.traits[traitName]) || {};
+      if (!traitConfig.overrides) {
+        return;
+      }
+      for (const stringKey of Object.keys(traitConfig.overrides)) {
+        const key = stringKey as keyof FieldsConfiguration<FactoryResultType>;
+        // If the key already exists in the base fields, we'll have defined it,
+        // so we don't need to worry about it.
+        if (key in config.fields === false) {
+          fieldsToReturn[key] = expandConfigField(traitConfig.overrides[key]);
+        }
+      }
+    });
+
     const traitPostBuilds = traitsArray.map((traitName) => {
       const traitConfig = (config.traits && config.traits[traitName]) || {};
       const postBuild = traitConfig.postBuild || identity;
