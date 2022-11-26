@@ -724,6 +724,64 @@ tap.test('logs a warning if you pass a trait that was not defined', (t) => {
   t.end();
 });
 
+tap.test('traits can override undefined values', (t) => {
+  interface User {
+    name: string;
+    tall?: boolean;
+  }
+
+  const userBuilder = build<User>({
+    fields: {
+      name: 'jack',
+    },
+    traits: {
+      tall: {
+        overrides: { tall: true },
+      },
+    },
+  });
+
+  const userWithoutTrait = userBuilder();
+  t.equal(userWithoutTrait.tall, undefined);
+  const userWithTrait = userBuilder({
+    traits: ['tall'],
+  });
+  t.same(userWithTrait, {
+    name: 'jack',
+    tall: true,
+  });
+  t.end();
+});
+
+tap.test('the latest trait with the value defined "wins"', (t) => {
+  interface User {
+    name: string;
+    tall?: boolean;
+  }
+
+  const userBuilder = build<User>({
+    fields: {
+      name: 'jack',
+    },
+    traits: {
+      tall: {
+        overrides: { tall: true },
+      },
+      short: {
+        overrides: { tall: false },
+      },
+    },
+  });
+  const userWithTrait = userBuilder({
+    traits: ['tall', 'short'],
+  });
+  t.same(userWithTrait, {
+    name: 'jack',
+    tall: false,
+  });
+  t.end();
+});
+
 tap.test('dates can be created and overwritten correctly', (t) => {
   interface Plan {
     createdAt: Date;
