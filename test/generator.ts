@@ -9,7 +9,7 @@ export const createTypeScriptSourceFile = (code: string) => {
   return ts.createSourceFile(fileName, code, ts.ScriptTarget.ESNext);
 };
 
-tap.test('generators', (t) => {
+tap.test('generates empty strings for string types', (t) => {
   const file = createTypeScriptSourceFile(`
     interface User {
       name: string;
@@ -28,6 +28,46 @@ tap.test('generators', (t) => {
     `const userBuilder = build<User>({
   fields: {
     name: '',
+  },
+});`,
+    result.code
+  );
+  t.end();
+});
+
+tap.test('generates sequence() fields for number types)', (t) => {
+  const file = createTypeScriptSourceFile(`
+    interface User {
+      name: string;
+      id: number;
+    }
+`);
+
+  const result = generate(file, 'User');
+  t.equal(
+    `const userBuilder = build<User>({
+  fields: {
+    name: '',
+    id: sequence(),
+  },
+});`,
+    result.code
+  );
+  t.end();
+});
+
+tap.test('generates oneOf() for union types', (t) => {
+  const file = createTypeScriptSourceFile(`
+    interface User {
+      colour: 'RED'|'BLUE'|5;
+    }
+`);
+
+  const result = generate(file, 'User');
+  t.equal(
+    `const userBuilder = build<User>({
+  fields: {
+    colour: oneOf('RED', 'BLUE', 5),
   },
 });`,
     result.code
