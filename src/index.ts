@@ -31,7 +31,7 @@ export type Overrides<FactoryResultType = any> = {
 export interface BuildTimeConfig<FactoryResultType> {
   overrides?: Overrides<FactoryResultType>;
   map?: (builtThing: FactoryResultType) => FactoryResultType;
-  traits?: string | string[];
+  traits?: string[];
 }
 
 export interface TraitsConfiguration<FactoryResultType> {
@@ -56,13 +56,6 @@ const isGenerator = (field: Field): field is FieldGenerator<any> => {
 export type ValueOf<T> = T[keyof T];
 
 const identity = <T>(x: T): T => x;
-
-const buildTimeTraitsArray = <FactoryResultType>(
-  buildTimeConfig: BuildTimeConfig<FactoryResultType>
-): string[] => {
-  const { traits = [] } = buildTimeConfig;
-  return Array.isArray(traits) ? traits : [traits];
-};
 
 const getValueOrOverride = (
   overrides: Overrides,
@@ -113,7 +106,7 @@ export const build = <FactoryResultType>(
     const finalBuiltThing = mapValues(fields, (fieldValue, fieldKey) => {
       const overrides = buildTimeConfig.overrides || {};
 
-      const traitsArray = buildTimeTraitsArray(buildTimeConfig);
+      const traitsArray = buildTimeConfig.traits || [];
 
       const traitOverrides = traitsArray.reduce<Overrides<FactoryResultType>>(
         (overrides, currentTraitKey) => {
@@ -182,7 +175,7 @@ export const build = <FactoryResultType>(
     buildTimeConfig: BuildTimeConfig<FactoryResultType> = {}
   ) => {
     const fieldsToReturn = expandConfigFields(config.fields, buildTimeConfig);
-    const traitsArray = buildTimeTraitsArray(buildTimeConfig);
+    const traitsArray = buildTimeConfig.traits || [];
 
     // A user might define a value in a trait that doesn't exist in the base
     // set of fields. So we need to check now if the traits set any values that

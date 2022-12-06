@@ -579,7 +579,7 @@ tap.test('allows a trait to be defined and then used', (t) => {
   });
 
   const userNoTrait = userBuilder();
-  const userWithTrait = userBuilder({ traits: 'admin' });
+  const userWithTrait = userBuilder({ traits: ['admin'] });
   t.equal(userNoTrait.admin, false);
   t.equal(userWithTrait.admin, true);
   t.end();
@@ -608,7 +608,7 @@ tap.test('allows a trait to define a postBuild function', (t) => {
   });
 
   const userNoTrait = userBuilder();
-  const userWithTrait = userBuilder({ traits: 'admin' });
+  const userWithTrait = userBuilder({ traits: ['admin'] });
   t.equal(userNoTrait.name, 'jack');
   t.equal(userWithTrait.name, 'postBuildTrait');
   t.end();
@@ -633,7 +633,7 @@ tap.test('applies build time overrides over traits', (t) => {
   });
 
   const userWithTrait = userBuilder({
-    traits: 'admin',
+    traits: ['admin'],
     overrides: {
       admin: perBuild(() => false),
     },
@@ -714,7 +714,7 @@ tap.test('logs a warning if you pass a trait that was not defined', (t) => {
     },
   });
   const userWithTrait = userBuilder({
-    traits: 'not-passed',
+    traits: ['not-passed'],
   });
 
   t.same(userWithTrait, { name: 'jack' });
