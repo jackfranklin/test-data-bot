@@ -94,6 +94,10 @@ function mapValues<InputObject extends object, Key extends keyof InputObject>(
 export interface Builder<FactoryResultType> {
   (buildTimeConfig?: BuildTimeConfig<FactoryResultType>): FactoryResultType;
   reset(): void;
+  many(
+    count: number,
+    buildTimeConfig?: BuildTimeConfig<FactoryResultType>
+  ): FactoryResultType[];
 }
 
 export const build = <FactoryResultType>(
@@ -219,9 +223,18 @@ export const build = <FactoryResultType>(
 
     return buildTimeMapFunc(postBuild(afterTraitPostBuildFields));
   };
+
   builder.reset = () => {
     sequenceCounter = 0;
   };
+
+  builder.many = (
+    times: number,
+    buildTimeConfig: BuildTimeConfig<FactoryResultType>
+  ): FactoryResultType[] => {
+    return new Array(times).fill(builder(buildTimeConfig));
+  };
+
   return builder;
 };
 

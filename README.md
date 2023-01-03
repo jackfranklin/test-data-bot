@@ -108,7 +108,7 @@ const userFour = userBuilder();
 // userFour.id === 2
 ```
 
-### Randomly picking between an option
+### Randomly picking between an option with `oneOf`
 
 If you want an object to have a random value, picked from a list you control, you can use `oneOf`:
 
@@ -191,6 +191,36 @@ const userBuilder = build({
     name: perBuild(() => myFakeLibrary.randomName()),
   },
 });
+```
+
+### Creating multiple instances
+
+If you want to create multiple instances of a builder at once, you can use the `many` method on the builder:
+
+```js
+const userBuilder = build({
+  fields: {
+    name: 'jack',
+  },
+});
+
+const users = userBuilder.many(20); // Creates an array of 20 users.
+```
+
+If you want to pass in any build time configuration, you can pass in a second argument which takes the exact same configuration as calling `userBuilder()` directly:
+
+```js
+const userBuilder = build({
+  fields: {
+    name: 'jack',
+  },
+});
+
+const users = userBuilder.many(20, {
+  overrides: {
+    name: 'bob'
+  }
+}); // Creates an array of 20 users, each called "bob"!
 ```
 
 ### Mapping over all the created objects with `postBuild`

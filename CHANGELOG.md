@@ -1,3 +1,7 @@
+### Unreleased
+
+- Added `many(N)` as a helper method to create an array of `N` instances. [PR](https://github.com/jackfranklin/test-data-bot/pull/899).
+
 ### 2.0.0 - 17 Mar 2022
 
 - **BREAKING** Removed Faker support. If you wish to use it, you may, and you can use the `perBuild` generator to integrate it. [PR](https://github.com/jackfranklin/test-data-bot/pull/603).
