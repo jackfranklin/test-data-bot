@@ -232,7 +232,7 @@ export const build = <FactoryResultType>(
     times: number,
     buildTimeConfig: BuildTimeConfig<FactoryResultType>
   ): FactoryResultType[] => {
-    return new Array(times).fill(builder(buildTimeConfig));
+    return new Array(times).fill(0).map((_) => builder(buildTimeConfig));
   };
 
   return builder;

@@ -870,3 +870,19 @@ tap.test('can create multiple instances with traits', (t) => {
   }
   t.end();
 });
+
+tap.test('each instance of build.many is unique', (t) => {
+  interface User {
+    name: string;
+  }
+  const userBuilder = build<User>({
+    fields: {
+      name: 'jack',
+    },
+  });
+  const users = userBuilder.many(20);
+  t.same(users.length, 20);
+  // Ensure that all users are unique objects
+  t.same(new Set(users).size, 20);
+  t.end();
+});
