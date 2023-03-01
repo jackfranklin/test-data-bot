@@ -1,4 +1,5 @@
 import { build, sequence, oneOf, bool, perBuild } from '../src/index';
+
 import sinon from 'sinon';
 import tap from 'tap';
 
@@ -803,5 +804,85 @@ tap.test('dates can be created and overwritten correctly', (t) => {
   });
   t.type(planWithCustomDate.createdAt, 'Date');
 
+  t.end();
+});
+
+tap.test('can create multiple instances of a builder easily', (t) => {
+  interface User {
+    name: string;
+  }
+  const userBuilder = build<User>({
+    fields: {
+      name: 'jack',
+    },
+  });
+  const users = userBuilder.many(20);
+  t.same(users.length, 20);
+  for (const user of users) {
+    t.same(user, { name: 'jack' });
+  }
+  t.end();
+});
+
+tap.test('can create multiple instances and override them', (t) => {
+  interface User {
+    name: string;
+  }
+  const userBuilder = build<User>({
+    fields: {
+      name: 'jack',
+    },
+  });
+  const users = userBuilder.many(20, {
+    overrides: {
+      name: 'bob',
+    },
+  });
+  t.same(users.length, 20);
+  for (const user of users) {
+    t.same(user, { name: 'bob' });
+  }
+  t.end();
+});
+
+tap.test('can create multiple instances with traits', (t) => {
+  interface User {
+    name: string;
+  }
+  const userBuilder = build<User>({
+    fields: {
+      name: 'jack',
+    },
+    traits: {
+      calledBob: {
+        overrides: {
+          name: 'bob',
+        },
+      },
+    },
+  });
+  const users = userBuilder.many(20, {
+    traits: ['calledBob'],
+  });
+  t.same(users.length, 20);
+  for (const user of users) {
+    t.same(user, { name: 'bob' });
+  }
+  t.end();
+});
+
+tap.test('each instance of build.many is unique', (t) => {
+  interface User {
+    name: string;
+  }
+  const userBuilder = build<User>({
+    fields: {
+      name: 'jack',
+    },
+  });
+  const users = userBuilder.many(20);
+  t.same(users.length, 20);
+  // Ensure that all users are unique objects
+  t.same(new Set(users).size, 20);
   t.end();
 });
