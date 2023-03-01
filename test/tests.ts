@@ -22,6 +22,23 @@ tap.test('can build a basic object from a factory', (t) => {
   t.end();
 });
 
+tap.test('you can use the .one() method to build a single instance', (t) => {
+  interface User {
+    name: string;
+  }
+
+  const userBuilder = build<User>({
+    fields: {
+      name: 'jack',
+    },
+  });
+
+  const user = userBuilder.one();
+  t.same(user, { name: 'jack' });
+  t.same(user, { name: 'jack' });
+  t.end();
+});
+
 tap.test('can build an object with primitive values only', (t) => {
   interface User {
     name: string;

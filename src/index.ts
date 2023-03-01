@@ -94,6 +94,7 @@ function mapValues<InputObject extends object, Key extends keyof InputObject>(
 export interface Builder<FactoryResultType> {
   (buildTimeConfig?: BuildTimeConfig<FactoryResultType>): FactoryResultType;
   reset(): void;
+  one(buildTimeConfig?: BuildTimeConfig<FactoryResultType>): FactoryResultType;
   many(
     count: number,
     buildTimeConfig?: BuildTimeConfig<FactoryResultType>
@@ -228,11 +229,17 @@ export const build = <FactoryResultType>(
     sequenceCounter = 0;
   };
 
+  builder.one = (
+    buildTimeConfig: BuildTimeConfig<FactoryResultType>
+  ): FactoryResultType => {
+    return builder(buildTimeConfig);
+  };
+
   builder.many = (
     times: number,
     buildTimeConfig: BuildTimeConfig<FactoryResultType>
   ): FactoryResultType[] => {
-    return new Array(times).fill(0).map((_) => builder(buildTimeConfig));
+    return new Array(times).fill(0).map(() => builder(buildTimeConfig));
   };
 
   return builder;
