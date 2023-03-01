@@ -1,6 +1,6 @@
 ### Unreleased
 
-- Added `one(config)` as a helper method to create a single instance. This is equal to calling the created builder directly.
+- Added `one(config)` as a helper method to create a single instance. This is equal to calling the created builder directly. [PR](https://github.com/jackfranklin/test-data-bot/pull/937)
 - Added `many(N, config)` as a helper method to create an array of `N` instances. [PR](https://github.com/jackfranklin/test-data-bot/pull/899).
 
 ### 2.0.0 - 17 Mar 2022
