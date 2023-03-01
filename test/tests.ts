@@ -18,7 +18,6 @@ tap.test('can build a basic object from a factory', (t) => {
 
   const user = userBuilder();
   t.same(user, { name: 'jack' });
-  t.same(user, { name: 'jack' });
   t.end();
 });
 
@@ -35,7 +34,22 @@ tap.test('you can use the .one() method to build a single instance', (t) => {
 
   const user = userBuilder.one();
   t.same(user, { name: 'jack' });
-  t.same(user, { name: 'jack' });
+  t.end();
+});
+
+tap.test('the one() method supports overrides', (t) => {
+  interface User {
+    name: string;
+  }
+
+  const userBuilder = build<User>({
+    fields: {
+      name: 'jack',
+    },
+  });
+
+  const user = userBuilder.one({ overrides: { name: 'alice' } });
+  t.same(user, { name: 'alice' });
   t.end();
 });
 

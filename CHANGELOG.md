@@ -1,7 +1,9 @@
-### Unreleased
+### 2.1.0 - 01 Mar 2023
 
-- Added `one(config)` as a helper method to create a single instance. This is equal to calling the created builder directly. [PR](https://github.com/jackfranklin/test-data-bot/pull/937)
-- Added `many(N, config)` as a helper method to create an array of `N` instances. [PR](https://github.com/jackfranklin/test-data-bot/pull/899).
+- New feature: Added `one(config)` as a helper method to create a single instance. This is equal to calling the created builder directly. [PR](https://github.com/jackfranklin/test-data-bot/pull/937)
+- New feature: Added `many(N, config)` as a helper method to create an array of `N` instances. [PR](https://github.com/jackfranklin/test-data-bot/pull/899).
+- Bug fix: incorrect overrriding of `Date` fields. [PR](https://github.com/jackfranklin/test-data-bot/pull/852)
+- Bug fix: allow traits to override undefined values. [PR](https://github.com/jackfranklin/test-data-bot/pull/866)
 
 ### 2.0.0 - 17 Mar 2022
 

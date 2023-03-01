@@ -36,14 +36,20 @@ const userBuilder = build({
   },
 });
 
-const user = userBuilder();
+const user = userBuilder.one();
 console.log(user);
 // => { name: 'jack'}
 ```
 
 _While the examples in this README use `require`, you can also use `import {build} from '@jackfranklin/test-data-bot'`._
 
-Once you've created a builder, you can call it to generate an instance of that object - in this case, a `user`.
+Once you've created a builder, you can call the `one` method it returns to generate an instance of that object - in this case, a `user`.
+
+```
+const user = userBuilder.one();
+```
+
+> You can also call the builder directly to get a single instance - `userBuilder()`. v2.1 of test-data-bot shipped with the `one()` method and that is now the recommended way of constructing these objects.
 
 It would be boring though if each user had the same `name` - so test-data-bot lets you generate data via some API methods:
 
@@ -60,8 +66,8 @@ const userBuilder = build({
   },
 });
 
-const userOne = userBuilder();
-const userTwo = userBuilder();
+const userOne = userBuilder.one();
+const userTwo = userBuilder.one();
 
 // userOne.id === 1
 // userTwo.id === 2
@@ -78,8 +84,8 @@ const userBuilder = build({
   },
 });
 
-const userOne = userBuilder();
-const userTwo = userBuilder();
+const userOne = userBuilder.one();
+const userTwo = userBuilder.one();
 
 // userOne.email === jack1@gmail.com
 // userTwo.email === jack2@gmail.com
@@ -96,11 +102,11 @@ const userBuilder = build({
   },
 });
 
-const userOne = userBuilder();
-const userTwo = userBuilder();
+const userOne = userBuilder.one();
+const userTwo = userBuilder.one();
 userBuilder.reset();
-const userThree = userBuilder();
-const userFour = userBuilder();
+const userThree = userBuilder.one();
+const userFour = userBuilder.one();
 
 // userOne.id === 1
 // userTwo.id === 2
@@ -154,8 +160,8 @@ const userBuilder = build({
 A user generated from this builder will always be the same data. However, if you generate two users using the builder above, they will have _exactly the same object_ for the `details` key:
 
 ```js
-const userOne = userBuilder();
-const userTwo = userBuilder();
+const userOne = userBuilder.one();
+const userTwo = userBuilder.one();
 
 userOne.details === userTwo.details; // true
 ```
@@ -174,8 +180,8 @@ const userBuilder = build({
   },
 });
 
-const userOne = userBuilder();
-const userTwo = userBuilder();
+const userOne = userBuilder.one();
+const userTwo = userBuilder.one();
 
 userOne.details === userTwo.details; // false
 ```
@@ -192,6 +198,54 @@ const userBuilder = build({
   },
 });
 ```
+
+## Overrides per-build
+
+You'll often need to generate a random object but control one of the values directly for the purpose of testing. When you call a builder you can pass in overrides which will override the builder defaults:
+
+```js
+const { build, fake, sequence } = require('@jackfranklin/test-data-bot');
+
+const userBuilder = build({
+  fields: {
+    id: sequence(),
+    name: fake(f => f.name.findName()),
+  },
+});
+
+const user = userBuilder.one({
+  overrides: {
+    id: 1,
+    name: 'jack',
+  },
+});
+
+// user.id === 1
+// user.name === 'jack'
+```
+
+If you need to edit the object directly, you can pass in a `map` function when you call the builder. This will be called after test-data-bot has generated the fake object, and lets you directly change its properties.
+
+```js
+const { build, sequence } = require('@jackfranklin/test-data-bot');
+
+const userBuilder = build('User', {
+  fields: {
+    id: sequence(),
+    name: 'jack',
+  },
+});
+
+const user = userBuilder.one({
+  map: user => {
+    user.name = user.name.toUpperCase();
+    return user;
+  },
+});
+```
+
+Using `overrides` and `map` lets you easily customise a specific object that a builder has created.
+
 
 ### Creating multiple instances
 
@@ -240,56 +294,9 @@ const userBuilder = build({
   },
 });
 
-const user = userBuilder();
+const user = userBuilder.one();
 // user.name will be uppercase
 ```
-
-## Overrides per-build
-
-You'll often need to generate a random object but control one of the values directly for the purpose of testing. When you call a builder you can pass in overrides which will override the builder defaults:
-
-```js
-const { build, fake, sequence } = require('@jackfranklin/test-data-bot');
-
-const userBuilder = build({
-  fields: {
-    id: sequence(),
-    name: fake(f => f.name.findName()),
-  },
-});
-
-const user = userBuilder({
-  overrides: {
-    id: 1,
-    name: 'jack',
-  },
-});
-
-// user.id === 1
-// user.name === 'jack'
-```
-
-If you need to edit the object directly, you can pass in a `map` function when you call the builder. This will be called after test-data-bot has generated the fake object, and lets you directly change its properties.
-
-```js
-const { build, sequence } = require('@jackfranklin/test-data-bot');
-
-const userBuilder = build('User', {
-  fields: {
-    id: sequence(),
-    name: 'jack',
-  },
-});
-
-const user = userBuilder({
-  map: user => {
-    user.name = user.name.toUpperCase();
-    return user;
-  },
-});
-```
-
-Using `overrides` and `map` lets you easily customise a specific object that a builder has created.
 
 ## Traits (*new in v1.3*)
 
@@ -317,7 +324,7 @@ const userBuilder = build<User>({
 Notice that we've defined the `admin` trait here. You don't need to do this; you could easily override the `admin` field each time:
 
 ```js
-const adminUser = userBuilder({ overrides: { admin: true } });
+const adminUser = userBuilder.one({ overrides: { admin: true } });
 ```
 
 But imagine that the field changes, or the way you represent admins changes. Or imagine setting an admin is not just one field but a few fields that need to change. Maybe an admin's email address always has to be a certain domain. We can define that behaviour once as a trait:
@@ -339,14 +346,14 @@ const userBuilder = build<User>({
 And now building an admin user is easy:
 
 ```js
-const admin = userBuilder({ traits: 'admin' });
+const admin = userBuilder.one({ traits: 'admin' });
 ```
 
 You can define and use multiple traits when building an object. Be aware that if two traits override the same value, the one passed in last wins:
 
 ```
 // any properties defined in other-trait will override any that admin sets
-const admin = userBuilder({ traits: ['admin', 'other-trait'] });
+const admin = userBuilder.one({ traits: ['admin', 'other-trait'] });
 ```
 
 ## TypeScript support
@@ -368,7 +375,7 @@ const userBuilder = build<User>('User', {
   },
 });
 
-const users = userBuilder();
+const users = userBuilder.one();
 ```
 
 You should get TypeScript errors if the builder doesn't satisfy the interface you've given it.
