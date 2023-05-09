@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@sinonjs/fake-timers": "^10.0.0",
-    "@types/node": "^18.0.0",
+    "@types/node": "^20.1.1",
     "@types/sinon": "^10.0.13",
     "@types/tap": "^15.0.7",
     "@typescript-eslint/eslint-plugin": "^5.6.0",
