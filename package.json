@@ -40,7 +40,7 @@
     "@types/node": "^20.2.5",
     "@types/sinon": "^10.0.13",
     "@types/tap": "^15.0.7",
-    "@typescript-eslint/eslint-plugin": "^5.6.0",
+    "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^5.6.0",
     "eslint": "^8.4.1",
     "eslint-config-prettier": "^8.0.0",
