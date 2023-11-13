@@ -47,7 +47,7 @@
     "eslint-config-unobtrusive": "^1.2.5",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-tap": "^1.2.1",
-    "prettier": "^2.5.1",
+    "prettier": "^3.1.0",
     "sinon": "^15.0.1",
     "tap": "^16.3.0",
     "ts-node": "^10.9.1",
