@@ -1,3 +1,11 @@
+# NO LONGER MAINTAINED
+
+**IMPORTANT: This project is no longer maintained and will be archived soon**.
+
+I recommend using [minicry-js](https://github.com/Stivooo/mimicry-js) which is a more modern, up to date factory library inspired by test-data-bot, and fixing some of the open issues and bugs.
+
+Alternatively, if you wish to help maintain test-data-bot, please feel free to open an issue or send PRs.
+
 # @jackfranklin/test-data-bot
 
 [![npm version](https://badge.fury.io/js/%40jackfranklin%2Ftest-data-bot.svg)](https://badge.fury.io/js/%40jackfranklin%2Ftest-data-bot)
@@ -80,7 +88,7 @@ const { build, sequence } = require('@jackfranklin/test-data-bot');
 
 const userBuilder = build({
   fields: {
-    email: sequence(x => `jack${x}@gmail.com`),
+    email: sequence((x) => `jack${x}@gmail.com`),
   },
 });
 
@@ -209,7 +217,7 @@ const { build, fake, sequence } = require('@jackfranklin/test-data-bot');
 const userBuilder = build({
   fields: {
     id: sequence(),
-    name: fake(f => f.name.findName()),
+    name: fake((f) => f.name.findName()),
   },
 });
 
@@ -237,7 +245,7 @@ const userBuilder = build('User', {
 });
 
 const user = userBuilder.one({
-  map: user => {
+  map: (user) => {
     user.name = user.name.toUpperCase();
     return user;
   },
@@ -245,7 +253,6 @@ const user = userBuilder.one({
 ```
 
 Using `overrides` and `map` lets you easily customise a specific object that a builder has created.
-
 
 ### Creating multiple instances
 
@@ -272,8 +279,8 @@ const userBuilder = build({
 
 const users = userBuilder.many(20, {
   overrides: {
-    name: 'bob'
-  }
+    name: 'bob',
+  },
 }); // Creates an array of 20 users, each called "bob"!
 ```
 
@@ -286,9 +293,9 @@ const { build, fake } = require('@jackfranklin/test-data-bot');
 
 const userBuilder = build({
   fields: {
-    name: fake(f => f.name.findName()),
+    name: fake((f) => f.name.findName()),
   },
-  postBuild: user => {
+  postBuild: (user) => {
     user.name = user.name.toUpperCase();
     return user;
   },
@@ -298,7 +305,7 @@ const user = userBuilder.one();
 // user.name will be uppercase
 ```
 
-## Traits (*new in v1.3*)
+## Traits (_new in v1.3_)
 
 Traits let you define a set of overrides for a factory that can easily be re-applied. Let's imagine you've got a users factory where users can be admins:
 
@@ -371,7 +378,7 @@ interface User {
 const userBuilder = build<User>('User', {
   fields: {
     id: sequence(),
-    name: perBuild(() => yourCustomFakerLibary().name)
+    name: perBuild(() => yourCustomFakerLibary().name),
   },
 });
 
@@ -385,13 +392,13 @@ You should get TypeScript errors if the builder doesn't satisfy the interface yo
 Prior to v2.0.0 of this library, we shipped built-in support for using Faker.js to generate data. It was removed because it was a big dependency to ship to all users, even those who don't use faker. If you want to use it you can, in combination with the `perBuild` builder:
 
 ```js
-import {build, perBuild} from '@jackfranklin/test-data-bot';
+import { build, perBuild } from '@jackfranklin/test-data-bot';
 
 // This can be any fake data library you like.
 import fake from 'faker';
 
 const userBuilder = build({
   // Within perBuild, call your faker library directly.
-  name: perBuild(() => fake().name())
-})
+  name: perBuild(() => fake().name()),
+});
 ```
